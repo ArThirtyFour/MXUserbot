@@ -20,6 +20,5 @@ dependencies = [
     "ruamel-yaml>=0.19.1",
 ]
 
-
 [tool.uv.sources]
 mxc = { git = "https://github.com/MxUserBot/MXC-python" }
