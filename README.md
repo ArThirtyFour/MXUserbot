@@ -1,6 +1,6 @@
 # MxUserbot
 
-<img width="1376" height="768" alt="result" src="https://github.com/user-attachments/assets/2e266925-c17b-49db-ac7b-1635cb3799b8" />
+<img width="1376" height="768" alt="result" src="assets/banner.png" />
 
 **What is a userbot:** A bot that runs directly on your account, acting on your behalf.  
 **Purpose:** From showing off to your friends that you use bot commands from your account to automation and useful modules. It all depends on you.
