@@ -1,6 +1,6 @@
 
 <p align="center">
-  <p>✨ | <b>MXUserbot</b> | ✨</p>
+  ✨ | <b>MXUserbot</b> | ✨
 </p>
 
 <p align="center">
