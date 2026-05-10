@@ -1,6 +1,9 @@
 # MxUserbot
 
-<img width="1376" height="768" alt="result" src="assets/banner.png" />
+<p align="center">
+  <img width="1376" height="768" alt="result" src="assets/banner.png" />
+  <sub><i>banner by: @ArThirtyFour</i></sub>
+</p>
 
 **What is a userbot:** A bot that runs directly on your account, acting on your behalf.  
 **Purpose:** From showing off to your friends that you use bot commands from your account to automation and useful modules. It all depends on you.
