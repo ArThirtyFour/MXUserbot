@@ -3,7 +3,7 @@
 </div>
 
 <p align="center">
-  <img width="1376" height="768" alt="result" src="assets/banner.png" />
+  <img width="1376" height="768" alt="result" src="assets/banner.webp" />
   <sub><i>banner by: @ArThirtyFour</i></sub>
 </p>
 
@@ -27,12 +27,12 @@ If you have ideas or code — send them over, I will review everything.
 
 ## Advantages
 
-* Rewritten in `mautrix-python`
-* Support for [`uv`](https://docs.astral.sh/uv/#highlights)
-* Simple module creation
-* Modular structure
-* Module security
-* E2EE / SAS out of the box
+
+* сайт для управления: модули/конфигурация
+* EE2E / SAS из коробки
+* FSM
+* EmojiCallback
+
 
 ---
 
@@ -42,10 +42,10 @@ If you have ideas or code — send them over, I will review everything.
 ```bash
 git clone https://github.com/PashaHatsune/MxUserbot.git
 cd MxUserbot
-docker-compose up -d --build
+docker-compose up --build
 ```
 
-### Manual Installation
+### Manual Installation on [`uv`](https://docs.astral.sh/uv/#highlights)
 ```bash
 git clone https://github.com/PashaHatsune/MxUserbot.git
 cd MxUserbot
@@ -57,12 +57,7 @@ uv run -m src.mxuserbot
 
 ## Documentation
 
-Quick links:
-
-- [Module Development](docs/module-development.md)
-- [Utils Reference](docs/utils-reference.md)
-- [Security](docs/security.md)
-
+https://mxuserbot.github.io/documentation/
 ---
 
 # Donate
