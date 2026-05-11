@@ -23,7 +23,8 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from mxc.exceptions import UsageError
 from mxc import utils
-from mxc.types import Image
+from mxc.types import Image, EmojiButton
+from mxc.utils.keyboard import EmojiKeyBoard
 from .. import loader
 
 
@@ -154,14 +155,13 @@ class HelperModule(loader.Module):
                 ctx.data["page"] = page
                 await ctx.edit(rendered[page])
 
-            markup = utils.EmojiKeyBoard(
+            markup = EmojiKeyBoard(
                 rows=[[
-                    utils.EmojiButton(emoji="⬅️", data="prev"),
-                    utils.EmojiButton(emoji="➡️", data="next"),
+                    EmojiButton(emoji="⬅️", data="prev"),
+                    EmojiButton(emoji="➡️", data="next"),
                 ]],
                 callback=on_page,
                 data={"page": 0},
-                allowed_senders=event.sender,
                 remove_clicked=False,
             )
             await utils.answer(mx, rendered[0], event=event, reply_markup=markup)

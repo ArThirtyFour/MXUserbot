@@ -19,8 +19,6 @@ class Meta:
     tags = ["settings"]
 
 
-
-
 from mxc.exceptions import UsageError
 from mxc import utils
 from .. import loader

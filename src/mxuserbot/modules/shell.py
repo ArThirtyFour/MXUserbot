@@ -20,6 +20,8 @@ import asyncio
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from mxc import utils
+from mxc.types import EmojiButton
+from mxc.utils.keyboard import EmojiKeyBoard
 from .. import loader
 
 
@@ -140,16 +142,14 @@ class ShellModule(loader.Module):
                     await _exec(edit_target=ctx)
                 else:
                     await ctx.edit(self.strings.get("cancelled"))
-                await ctx.close(clear_reactions=True)
+                await ctx.close()
 
-            markup = utils.EmojiKeyBoard(
+            markup = EmojiKeyBoard(
                 rows=[[
-                    utils.EmojiButton("✅", "yes"),
-                    utils.EmojiButton("❌", "no"),
+                    EmojiButton("✅", "yes"),
+                    EmojiButton("❌", "no"),
                 ]],
                 callback=_on_confirm,
-                allowed_senders=event.sender,
-                single_use=True,
             )
 
             await utils.answer(

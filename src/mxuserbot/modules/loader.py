@@ -25,6 +25,8 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from mxc.exceptions import UsageError
 from mxc import utils
+from mxc.types import EmojiButton
+from mxc.utils.keyboard import EmojiKeyBoard
 from .. import loader
 
 
@@ -133,16 +135,14 @@ class LoaderModule(loader.Module):
                     await on_confirm(ctx)
             else:
                 await ctx.edit(self.strings["confirm_cancelled"])
-            await ctx.close(clear_reactions=True)
+            await ctx.close()
 
-        markup = utils.EmojiKeyBoard(
+        markup = EmojiKeyBoard(
             rows=[[
-                utils.EmojiButton("✅", "yes"),
-                utils.EmojiButton("❌", "no"),
+                EmojiButton("✅", "yes"),
+                EmojiButton("❌", "no"),
             ]],
             callback=_callback,
-            allowed_senders=event.sender,
-            single_use=True,
         )
 
         await utils.answer(
@@ -211,14 +211,13 @@ class LoaderModule(loader.Module):
             ctx.data["page"] = page
             await ctx.edit(pages[page])
 
-        markup = utils.EmojiKeyBoard(
+        markup = EmojiKeyBoard(
             rows=[[
-                utils.EmojiButton(emoji="⬅️", data="prev"),
-                utils.EmojiButton(emoji="➡️", data="next"),
+                EmojiButton(emoji="⬅️", data="prev"),
+                EmojiButton(emoji="➡️", data="next"),
             ]],
             callback=on_page,
             data={"page": 0},
-            allowed_senders=event.sender,
             remove_clicked=False,
         )
         await utils.answer(mx, pages[0], event=event, reply_markup=markup)
@@ -262,7 +261,7 @@ class LoaderModule(loader.Module):
             status_id = await utils.answer(mx, self.strings["downloading"])
 
             async def _install(ctx):
-                await ctx.close(clear_reactions=True)
+                await ctx.close()
                 if await self.repo.install(**install_kw):
                     await utils.answer(mx, self.strings["done"].format(name=fname), edit_id=status_id)
                     await self._show_module_help(mx, event, fname)
@@ -289,7 +288,7 @@ class LoaderModule(loader.Module):
             return await utils.answer(mx, self.strings["repo_not_found"].format(id=payload.target), edit_id=status_id)
 
         async def _install(ctx):
-            await ctx.close(clear_reactions=True)
+            await ctx.close()
             await utils.answer(mx, self.strings["downloading"], edit_id=status_id)
             if await self.repo.install(target=payload.target):
                 filename = url.split("/")[-1]
