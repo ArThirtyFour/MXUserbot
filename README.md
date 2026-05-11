@@ -2,7 +2,6 @@
   <h1>✨ | MXUserbot | ✨</h1>
   <img width="1376" height="768" alt="result" src="assets/banner.webp"/>
   <br>
-  <sub><i>banner by: @ArThirtyFour</i></sub>
 </div>
 
 <br>
@@ -25,22 +24,22 @@
 
 <table cellspacing="0" width="100%">
  <tr>
-  <td width="50%" style="border:1px solid #30363d;padding:0;vertical-align:top"><div style="padding:12px;border-bottom:1px solid #30363d"><b>Emoji Callbacks</b> - Reactions as buttons.</div><video src="assets/promo/EMOJICALLBACK.mp4" controls width="100%" style="display:block"></video></td>
-  <td width="50%" style="border:1px solid #30363d;padding:0;vertical-align:top"><div style="padding:12px;border-bottom:1px solid #30363d"><b>FSM</b> - Multi-step dialogs with state persistence.</div><video src="assets/promo/FSM.mp4" controls width="100%" style="display:block"></video></td>
+  <td width="50%" style="border:1px solid #30363d;padding:0;vertical-align:top"><div style="padding:12px;border-bottom:1px solid #30363d"><b>Emoji Callbacks</b> - Reactions as buttons.</div><video src="https://raw.githubusercontent.com/MxUserBot/MXUserbot/main/assets/promo/EMOJICALLBACK.mp4" controls width="100%" style="display:block"></video></td>
+  <td width="50%" style="border:1px solid #30363d;padding:0;vertical-align:top"><div style="padding:12px;border-bottom:1px solid #30363d"><b>FSM</b> - Multi-step dialogs with state persistence.</div><video src="https://raw.githubusercontent.com/MxUserBot/MXUserbot/main/assets/promo/FSM.mp4" controls width="100%" style="display:block"></video></td>
  </tr>
 </table>
 
 <table cellspacing="0" width="100%">
  <tr>
-  <td width="50%" style="border:1px solid #30363d;padding:0;vertical-align:top"><div style="padding:12px;border-bottom:1px solid #30363d"><b>Web Panel</b> - Manage modules/account via web panel</div><video src="assets/promo/SITE.mp4" controls width="100%" style="display:block"></video></td>
-  <td width="50%" style="border:1px solid #30363d;padding:0;vertical-align:top"><div style="padding:12px;border-bottom:1px solid #30363d"><b>SUDO LIST</b> - Grant your friend permission to execute commands </div><video src="assets/promo/SUDO.mp4" controls width="100%" style="display:block"></video></td>
+  <td width="50%" style="border:1px solid #30363d;padding:0;vertical-align:top"><div style="padding:12px;border-bottom:1px solid #30363d"><b>Web Panel</b> - Manage modules/account via web panel</div><video src="https://raw.githubusercontent.com/MxUserBot/MXUserbot/main/assets/promo/SITE.mp4" controls width="100%" style="display:block"></video></td>
+  <td width="50%" style="border:1px solid #30363d;padding:0;vertical-align:top"><div style="padding:12px;border-bottom:1px solid #30363d"><b>SUDO LIST</b> - Grant your friend permission to execute commands </div><video src="https://raw.githubusercontent.com/MxUserBot/MXUserbot/main/assets/promo/SUDO.mp4" controls width="100%" style="display:block"></video></td>
  </tr>
 </table>
 
 <table cellspacing="0" width="100%">
  <tr>
-  <td width="50%" style="border:1px solid #30363d;padding:0;vertical-align:top"><div style="padding:12px;border-bottom:1px solid #30363d"><b>SAS Verification</b> - Verify your device anywhere!.</div><video src="assets/promo/VERIF.mp4" controls width="100%" style="display:block"></video></td>
-  <td width="50%" style="border:1px solid #30363d;padding:0;vertical-align:top"><div style="padding:12px;border-bottom:1px solid #30363d"><b>Module Repository</b> — add custom repositories!</div><video src="assets/promo/REPOS.mp4" controls width="100%" style="display:block"></video></td>
+  <td width="50%" style="border:1px solid #30363d;padding:0;vertical-align:top"><div style="padding:12px;border-bottom:1px solid #30363d"><b>SAS Verification</b> - Verify your device anywhere!.</div><video src="https://raw.githubusercontent.com/MxUserBot/MXUserbot/main/assets/promo/VERIF.mp4" controls width="100%" style="display:block"></video></td>
+  <td width="50%" style="border:1px solid #30363d;padding:0;vertical-align:top"><div style="padding:12px;border-bottom:1px solid #30363d"><b>Module Repository</b> — add custom repositories!</div><video src="https://raw.githubusercontent.com/MxUserBot/MXUserbot/main/assets/promo/REPOS.mp4" controls width="100%" style="display:block"></video></td>
  </tr>
 </table>
 
@@ -90,19 +89,28 @@ uv run -m src.mxuserbot</code></pre>
 
 <h3>Documentation</h3>
 <p><a href="https://mxuserbot.github.io/documentation/">https://mxuserbot.github.io/documentation/</a></p>
-
-<br>
-
+<hr>
 <h3>Donate</h3>
 <p><a href="https://destream.net/live/Pashahatsune/donate">https://destream.net/live/Pashahatsune/donate</a></p>
 
 <br>
 
-<h3>Disclaimer</h3>
+<h3>Credits</h3>
 <ul>
-  <li><b>Full Responsibility:</b> You are solely responsible for your actions.</li>
-  <li><b>No Liability:</b> The developer shall not be held liable for any damages.</li>
-  <li><b>Strict Prohibition:</b> Use for spam or fraud is strictly prohibited.</li>
+  <li><b>@ArThirtyFour</b> — thanks for help with the code/banner.</li>
+  <li><b>@maseckt</b> — thanks for help with the code/videos.</li>
+</ul>
+
+<br>
+
+<h2>Disclaimer</h2>
+<p align="justify">
+  This software is provided <b>"as is"</b>, without warranty of any kind, express or implied. By using this userbot, you acknowledge that:
+</p>
+<ul>
+  <li><b>Full Responsibility:</b> You are solely responsible for your actions and any consequences resulting from the use of this software.</li>
+  <li><b>No Liability:</b> The developer shall not be held liable for any damages, including but not limited to account bans, data loss, or legal issues.</li>
+  <li><b>Strict Prohibition:</b> Use of this bot for fraudulent activities, spam, or any actions that violate terms of service or local laws is strictly prohibited.</li>
 </ul>
 
 <br>
