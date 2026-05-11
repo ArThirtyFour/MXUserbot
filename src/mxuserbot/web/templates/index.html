@@ -16,13 +16,13 @@
 
     {% raw %}
     <div id="app" class="w-full max-w-[520px] z-10 relative">
-        <div class="lang-container">
-            <button v-for="l in ['en', 'ru']" :key="l" @click="setLang(l)" :class="['lang-btn', { active: lang === l }]">{{ l.toUpperCase() }}</button>
-        </div>
-
         <transition name="view-fade" mode="out-in">
-            <!-- WELCOME SCREEN -->
-            <div v-if="view === 'welcome'" key="welcome" class="bg-[#18181b]/80 border border-[#27272a] rounded-2xl p-10 text-center shadow-2xl backdrop-blur-md">
+            <div :key="view">
+                <div class="lang-container">
+                    <button v-for="l in ['en', 'ru']" :key="l" @click="setLang(l)" :class="['lang-btn', { active: lang === l }]">{{ l.toUpperCase() }}</button>
+                </div>
+
+                <div v-if="view === 'welcome'" class="bg-[#18181b]/80 border border-[#27272a] rounded-2xl p-10 text-center shadow-2xl backdrop-blur-md">
                 <h1 class="text-3xl font-bold mb-2 text-white mt-4">{{ t('app_title') }}</h1>
                 <p class="text-[#a1a1aa] text-sm mb-8">{{ t('welcome_subtitle') }}</p>
                 <div class="quote-box text-left">
@@ -51,7 +51,6 @@
                 </div>
             </div>
 
-            <!-- LOGIN SCREEN -->
             <form v-else-if="view === 'login'" key="login" @submit.prevent="handleLogin" class="bg-[#18181b]/80 border border-[#27272a] rounded-2xl p-10 text-center shadow-2xl backdrop-blur-md">
                 <h1 class="text-2xl font-bold mb-2 text-white mt-4">{{ t('auth_title') }}</h1>
                 <p class="text-[#a1a1aa] text-sm mb-8">{{ t('auth_subtitle') }}</p>
@@ -79,7 +78,6 @@
                 </div>
             </form>
 
-            <!-- RESULT SCREEN -->
             <div v-else-if="view === 'result'" key="result" class="bg-[#18181b]/80 border border-[#27272a] rounded-2xl p-10 text-center shadow-2xl backdrop-blur-md">
                 <h1 :class="['text-3xl font-bold mb-4 mt-4', result.ok ? 'text-emerald-400' : 'text-rose-400']">
                     {{ result.ok ? t('result_success') : t('result_failed') }}
@@ -89,6 +87,7 @@
                     <button v-if="result.ok" @click="goToPanel" class="w-full p-4 bg-emerald-900/80 text-emerald-50 border border-emerald-700/50 rounded-xl text-sm font-semibold transition-all">{{ t('btn_go_to_panel') }}</button>
                     <button v-else @click="view = 'login'" class="w-full p-3.5 bg-[#27272a] text-white rounded-xl text-sm font-semibold transition-all">{{ t('btn_try_again') }}</button>
                 </div>
+            </div>
             </div>
         </transition>
     </div>

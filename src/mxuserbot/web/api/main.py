@@ -126,14 +126,9 @@ async def run_web_server(mx, port: int):
         )
     )
     server.install_signal_handlers = lambda: None
+    mx._web_server = server
     
-    async def _serve_api():
-        try:
-            await server.serve()
-        except (KeyboardInterrupt, asyncio.CancelledError):
-            pass
-            
-    asyncio.create_task(_serve_api())
+    asyncio.create_task(server.serve())
     mx.log.info(f"🌐 | API local URL: http://{bind_host}:{port}")
     mx.log.info(f"🚀 | API Public URL: {public_url}")
 

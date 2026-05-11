@@ -348,9 +348,10 @@ class MXUserBot(Program):
         if self.client:
             self.client.stop()
 
-        if hasattr(self, "server"):
+        if hasattr(self, "_web_server"):
+            self._web_server.should_exit = True
+        elif hasattr(self, "server"):
             self.server.should_exit = True
-            await asyncio.sleep(0.5)
 
         if self.client and hasattr(self.client, "crypto") and self.client.crypto:
             store = self.client.crypto.crypto_store
