@@ -5,10 +5,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     cmake \
     make \
     libolm-dev \
+    librocksdb-dev \
+    g++ \
     && rm -rf /var/lib/apt/lists/*
-
 
 WORKDIR /app
 COPY . /app
-RUN uv sync --no-install-project
+
+# Синкаем проект
+RUN uv sync
+
+EXPOSE 8000
+
+RUN mkdir -p /app/data
+
 CMD ["uv", "run", "python", "-m", "src.mxuserbot"]

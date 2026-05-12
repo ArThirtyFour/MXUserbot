@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: mx_userbot_app
+    container_name: MXUserbot
     restart: unless-stopped
     ports:
       - "8000:8000"

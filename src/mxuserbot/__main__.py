@@ -339,7 +339,7 @@ class MXUserBot(Program):
             self.client.start(filter_data=filter_obj)
 
             try:
-                await asyncio.wait_for(sync_started.wait(), timeout=30)
+                await asyncio.wait_for(sync_started.wait(), timeout=60)
                 self.log.success(f"Userbot Started: {self.client.mxid}")
             except asyncio.TimeoutError:
                 self.log.error("Server timeout")
