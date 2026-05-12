@@ -10,15 +10,14 @@ import logging
 import sys
 import time
 import traceback
-from ast import List
-from pathlib import Path
 from typing import Any, Dict, Optional
 
 from loguru import logger
 from mautrix.api import HTTPAPI
-from mautrix.client import InternalEventType, SyncStream
+from mautrix.client import InternalEventType
 from mautrix.errors import MatrixConnectionError
 from mautrix.types import EventType
+from mautrix.types.filter import Filter, RoomEventFilter, RoomFilter, StateFilter
 from mautrix.util.config import BaseFileConfig, ConfigUpdateHelper, RecursiveDict
 from mautrix.util.program import Program
 from ruamel.yaml.comments import CommentedMap
@@ -114,7 +113,7 @@ class MXUserBot(Program):
             name='MXUserBot',
             description="MXUserbot - Matrix Userbot.",
             command="-",
-            version="2.2 | STABLE",
+            version="2.3 | STABLE",
             config_class=Config
         )
         self.fsm = FSM()
@@ -309,7 +308,8 @@ class MXUserBot(Program):
             self._prefixes = await self._get_core_conf("prefix")
             if not self._prefixes:
                 await self._db.set(owner="core", key="prefix", value=".")
-
+                self._prefixes = "." 
+                
             cb = CallBack(self)
             self.client.add_event_handler(EventType.ROOM_MEMBER, self.security.gate(cb.invite_cb))
             self.client.add_event_handler(EventType.ROOM_MEMBER, cb.memberevent_cb)
@@ -331,7 +331,20 @@ class MXUserBot(Program):
             
             self.client.add_event_handler(InternalEventType.SYNC_SUCCESSFUL, on_sync)
 
-            self.client.start(filter_data=None)
+            rooms_count = len(await self.client.get_joined_rooms())
+            self.log.info(
+                f"Starting initial sync for {rooms_count} rooms "
+                f"(filter: timeline_limit=50, lazy_load_members=True)..."
+            )
+
+            filter_obj = Filter(
+                room=RoomFilter(
+                    timeline=RoomEventFilter(limit=50),
+                    state=StateFilter(lazy_load_members=True),
+                    include_leave=False,
+                ),
+            )
+            self.client.start(filter_data=filter_obj)
 
             try:
                 await asyncio.wait_for(sync_started.wait(), timeout=30)

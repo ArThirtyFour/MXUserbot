@@ -44,27 +44,9 @@ class CallBack(BaseCallBack):
             return
 
         if evt.type == EventType.ROOM_ENCRYPTED:
-            success = await utils.decrypt_event(self.mx, evt)
-
-            if success:
-                evt.__class__ = MessageEvent
-            elif not success:
-                if evt.room_id not in self._encrypted_warned:
-                    self._encrypted_warned.add(evt.room_id)
-                    try:
-                        device = await self.mx.client.crypto.crypto_store.get_device(
-                            self.mx.client.mxid, self.mx.client.device_id
-                        )
-                        if device and device.trust < TrustState.VERIFIED:
-                            from mautrix.types import TextMessageEventContent
-                            content = TextMessageEventContent(
-                                body="⚠️ Cannot process commands in encrypted rooms: device not verified. Verify it in your client or use an unencrypted room.",
-                                msgtype="m.notice",
-                            )
-                            await self.mx.client.send_message(evt.room_id, content)
-                    except Exception:
-                        pass
+            if not await utils.decrypt_event(self.mx, evt):
                 return
+            evt.__class__ = MessageEvent
 
 
         if not getattr(evt.content, "body", None) or utils.should_ignore_event(self.mx, evt):
@@ -135,12 +117,10 @@ class CallBack(BaseCallBack):
                     )
                     return
 
-            reply_text = await wrapped.get_reply_text()
-
             try:
                 token = self.mx.interface._current_event.set(wrapped)
                 try:
-                    cmd_args = args_str if args_str else (reply_text or "")
+                    cmd_args = args_str
                     await self._invoke_validated(
                         func=func,
                         reserved_args=[await self.get_perm_module(mod), wrapped],
