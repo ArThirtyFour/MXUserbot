@@ -83,12 +83,13 @@ def ensure_ssh():
         print(f"❌ Error checking SSH: {e}")
         return False
 
-async def run_web_server(mx, port: int):
-    # Достаем значение из базы
-    db_host = await mx._db.get("core", "host")
 
-    # По умолчанию для локалки
-    if "SHARKHOST" in os.environ or "DOCKER" in os.environ:
+async def run_web_server(mx, port: int):
+    db_host = await mx._db.get("core", "host")
+    
+    is_docker = os.environ.get("DOCKER") == "true"
+
+    if is_docker:
         bind_host = '0.0.0.0'
     else:
         bind_host = '127.0.0.1'
@@ -97,7 +98,8 @@ async def run_web_server(mx, port: int):
 
     if db_host == "localhost":
         public_url = f"http://127.0.0.1:{port}"
-        bind_host = "127.0.0.1"
+        if not is_docker:
+            bind_host = "127.0.0.1"
         
     elif db_host == "0.0.0.0":
         public_url = f"http://0.0.0.0:{port}"

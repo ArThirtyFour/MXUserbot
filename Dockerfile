@@ -1,4 +1,5 @@
 FROM ghcr.io/astral-sh/uv:0.11.6-python3.12-trixie
+ENV DOCKER=true
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
@@ -12,7 +13,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 COPY . /app
 
-# Синкаем проект
 RUN uv sync
 
 EXPOSE 8000
