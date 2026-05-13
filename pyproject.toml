@@ -21,4 +21,4 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-mxc = { git = "https://github.com/MxUserBot/MXC-python" }
+mxc = { path = "/home/miku/dev/mxc", editable = true }

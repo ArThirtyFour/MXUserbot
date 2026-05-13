@@ -52,6 +52,14 @@ class CallBack(BaseCallBack):
         if not getattr(evt.content, "body", None) or utils.should_ignore_event(self.mx, evt):
             return
 
+        relates = getattr(evt.content, "relates_to", None) or getattr(evt.content, "_relates_to", None)
+        if relates and getattr(relates, "rel_type", None) == "m.replace":
+            new_content = getattr(evt.content, "new_content", None)
+            if new_content:
+                new_body = getattr(new_content, "body", None)
+                if new_body:
+                    evt.content.body = new_body
+
         body = evt.content.body.strip()
         prefix = await utils.get_prefix(self.mx)
         if isinstance(prefix, (list, tuple, set)):
