@@ -44,19 +44,35 @@ createApp({
             checkingSso.value = false;
         };
 
-        watch(() => form.mxid, (val) => {
-            if (ssoTimer) clearTimeout(ssoTimer);
-            const v = val.trim();
-            if (!v) {
-                ssoAvailable.value = false;
-                return;
-            }
-            ssoTimer = setTimeout(() => doSsoCheck(v), 400);
-        });
+         watch(() => form.mxid, (val) => {
+             if (ssoTimer) clearTimeout(ssoTimer);
+             const v = val.trim();
+             if (!v) {
+                 ssoAvailable.value = false;
+                 return;
+             }
+             if (v.startsWith('@')) {
+                 ssoAvailable.value = false;
+                 return;
+             }
+             ssoTimer = setTimeout(() => doSsoCheck(v), 400);
+         });
 
-        const handleLogin = async () => {
-            if (!form.mxid.includes(':')) return alert(t('mxid_format_error'));
-            loading.value = true;
+         const handleLogin = async () => {
+             const mxid = form.mxid.trim();
+             if (!mxid) return;
+             
+             if (!mxid.startsWith('@')) {
+                 alert(t('sso_or_invalid'));
+                 return;
+             }
+             
+             if (!form.password.trim()) {
+                 alert(t('password_required'));
+                 return;
+             }
+             
+             loading.value = true;
             try {
                 const res = await fetch('/api/auth', {
                     method: 'POST',

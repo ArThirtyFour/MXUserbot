@@ -19,6 +19,7 @@ class APIDependencies:
         token = await self.mx._db.get("core", "access_token")
         if not token:
             raise HTTPException(status_code=401, detail="Unauthorized")
+        await self.mx._ready.wait()
         return token
 
 

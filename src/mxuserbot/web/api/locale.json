@@ -33,7 +33,9 @@
     "session_initialized": "Session initialized. The userbot is now active.",
     "btn_go_to_panel": "Go to Panel",
     "btn_sso_signin": "Sign in with SSO",
-    "sso_unavailable": "SSO is not available for this server"
+    "sso_unavailable": "SSO is not available for this server",
+    "password_required": "Password is required for direct login",
+    "sso_or_invalid": "Use @user:server format for password login, or enter just the domain for SSO"
   },
   "ru": {
     "page_title": "MXUserbot | Инициализация сессии",
@@ -69,7 +71,9 @@
     "session_initialized": "Сессия инициализирована. Юзербот теперь активен.",
     "btn_go_to_panel": "Перейти в панель",
     "btn_sso_signin": "Войти через SSO",
-    "sso_unavailable": "SSO недоступен для этого сервера"
+    "sso_unavailable": "SSO недоступен для этого сервера",
+    "password_required": "Пароль обязателен для прямого входа",
+    "sso_or_invalid": "Для входа по паролю используйте формат @user:server, или только домен для SSO"
   }
 }
 

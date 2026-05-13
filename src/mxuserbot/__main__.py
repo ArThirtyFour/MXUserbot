@@ -113,10 +113,10 @@ class MXUserBot(Program):
     def __init__(self) -> None:
         super().__init__(
             module='main',
-            name='MXUserBot',
+            name='MXUserbot',
             description="MXUserbot - Matrix Userbot.",
             command="-",
-            version="2.3 | STABLE",
+            version="2.4 | STABLE",
             config_class=Config
         )
         self.fsm = FSM()
@@ -130,6 +130,7 @@ class MXUserBot(Program):
         self.active_modules: Dict[str, Any] = {}
         self.interface = MXBotInterface(self)
         self.auth_completed = asyncio.Event()
+        self._ready = asyncio.Event()
         
         self.start_time: Optional[int] = None
         self._prefixes: str = "."
@@ -341,6 +342,7 @@ class MXUserBot(Program):
             try:
                 await asyncio.wait_for(sync_started.wait(), timeout=60)
                 self.log.success(f"Userbot Started: {self.client.mxid}")
+                self._ready.set()
             except asyncio.TimeoutError:
                 self.log.error("Server timeout")
 
