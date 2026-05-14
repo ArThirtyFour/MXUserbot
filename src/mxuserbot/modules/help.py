@@ -26,6 +26,7 @@ from mxc import utils
 from mxc.types import Image, EmojiButton
 from mxc.utils.keyboard import EmojiKeyBoard
 from .. import loader
+from ..core.langs import STRINGS, switch as lang_switch, available as lang_available, current as lang_current
 
 
 class HelpPayload(BaseModel):
@@ -209,11 +210,12 @@ class HelperModule(loader.Module):
     @loader.command()
     async def info(self, mx, event: MessageEvent):
         """System information card"""
+        banner_url = await mx._get_core_conf("banner_url") or "mxc://matrix.org/YiqPIkdkkiJqMqizxJQTBqVx"
         await utils.answer(
             mx,
             room_id=event.room_id,
             media=Image(
-                url="mxc://matrix.org/YiqPIkdkkiJqMqizxJQTBqVx",
+                url=banner_url,
                 caption=self.strings["info_caption"].format(version=mx.version),
                 filename="info.png",
                 mimetype="image/png",
@@ -222,6 +224,25 @@ class HelperModule(loader.Module):
             ),
         )
 
+
+    @loader.command()
+    async def lang(self, mx, event: MessageEvent):
+        """<code> — Switch bot interface language"""
+        args = await utils.get_args(mx, event)
+        if not args:
+            return await utils.answer(
+                mx,
+                STRINGS("lang.current", code=lang_current())
+                + "<br>"
+                + STRINGS("lang.available", list=", ".join(lang_available())),
+                event=event,
+            )
+        if await lang_switch(args[0].lower()):
+            await utils.answer(mx, STRINGS("lang.switched", code=lang_current()), event=event)
+        else:
+            await utils.answer(
+                mx, STRINGS("lang.not_found", code=args[0].lower(), list=", ".join(lang_available())), event=event
+            )
 
     @loader.command()
     async def cfg(

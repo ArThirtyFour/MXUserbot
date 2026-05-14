@@ -25,15 +25,40 @@ from mxc import utils
 from mxc.exceptions import UsageError
 from mxc.fsm import FSMContext
 
+from .langs import STRINGS
+
 
 class CallBack(BaseCallBack):
     def __init__(self, mx: 'MXUserBot'):
         super().__init__(mx)
         self.mx = mx
+        self.strings = STRINGS
         self._encrypted_warned: set[str] = set()
 
     async def get_perm_module(self, mod):
         return self.mx if getattr(mod, "_is_core", False) else self.mx.interface
+
+    async def _execute_command(self, mod, func, wrapped, cmd_name, args_str, prefix):
+        try:
+            token = self.mx.interface._current_event.set(wrapped)
+            try:
+                await self._invoke_validated(
+                    func=func,
+                    reserved_args=[await self.get_perm_module(mod), wrapped],
+                    reserved_count=3,
+                    raw_input=args_str,
+                )
+            finally:
+                self.mx.interface._current_event.reset(token)
+
+        except (ValidationError, UsageError):
+            orig_f = getattr(func, "__func__", func)
+            raw_doc = getattr(orig_f, "__doc__", "") or ""
+            clean = raw_doc.replace("<", "&lt;").replace(">", "&gt;")
+            await wrapped.reply(self.strings("callback.usage", prefix=prefix, cmd=cmd_name, usage=clean))
+        except Exception as e:
+            logger.exception(f"Command execution error: {cmd_name}")
+            await wrapped.reply(self.strings("callback.error", error=e))
 
     async def message_cb(self, evt: MessageEvent):
         if evt.event_id in self.mx._ignore_ids:
@@ -119,37 +144,13 @@ class CallBack(BaseCallBack):
                 if missing:
                     desc = mod.config.get_description(missing)
                     await wrapped.reply(
-                        f"❌ <b>Config required:</b> {mod.name}<br>"
-                        f"Key <code>{missing}</code> ({desc}) is empty.<br>"
-                        f"Use: <code>{prefix}cfg {mod.name} {missing} [value]</code>"
+                        self.strings("callback.config_required",
+                            name=mod.name, key=missing, desc=desc, prefix=prefix)
                     )
                     return
 
-            try:
-                token = self.mx.interface._current_event.set(wrapped)
-                try:
-                    cmd_args = args_str
-                    await self._invoke_validated(
-                        func=func,
-                        reserved_args=[await self.get_perm_module(mod), wrapped],
-                        reserved_count=3,
-                        raw_input=cmd_args,
-                    )
-                finally:
-                    self.mx.interface._current_event.reset(token)
-                return
-
-            except (ValidationError, UsageError):
-                orig_f = getattr(func, "__func__", func)
-                raw_doc = getattr(orig_f, "__doc__", "") or ""
-                clean = raw_doc.replace("<", "&lt;").replace(">", "&gt;")
-
-                await wrapped.reply(f"ℹ️ <b>Usage:</b> <code>{prefix}{cmd_name} {clean}</code>")
-                return
-            except Exception as e:
-                logger.exception(f"Command execution error: {cmd_name}")
-                await wrapped.reply(f"❌ <b>Error:</b> <code>{e}</code>")
-                return
+            asyncio.create_task(self._execute_command(mod, func, wrapped, cmd_name, args_str, prefix))
+            return
 
         for mod in self.mx.active_modules.values():
             if not mod.enabled or not getattr(mod, "_is_ready", False):
@@ -186,5 +187,10 @@ class CallBack(BaseCallBack):
 
         if evt.type != EventType.ROOM_MEMBER:
             return
+
+        if evt.content.membership == Membership.LEAVE and self.mx.log_room and evt.room_id == self.mx.log_room:
+            if evt.state_key == self.mx.client.mxid or evt.state_key in getattr(self.mx.security, "owners", set()):
+                asyncio.create_task(self.mx._recreate_log_room())
+                return
 
         await self._dispatch_event(evt)

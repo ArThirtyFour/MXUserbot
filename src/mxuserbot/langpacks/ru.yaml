@@ -1,0 +1,69 @@
+# ©️ Pasha Hatsune, 2025-2026
+# This file is a part of MXUserbot
+# 🌐 https://github.com/MxUserBot/MXUserbot
+# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
+
+callback:
+  config_required: "❌ <b>Требуется настройка:</b> {name}<br>Ключ <code>{key}</code> ({desc}) пуст.<br>Используй: <code>{prefix}cfg {name} {key} [value]</code>"
+  usage: "ℹ️ <b>Использование:</b> <code>{prefix}{cmd} {usage}</code>"
+  error: "❌ <b>Ошибка:</b> <code>{error}</code>"
+
+loader:
+  help_name: "<b>📦 | {name}</b>"
+  help_name_version: " <i>v{version}</i>"
+  help_desc: "<b>ℹ️ | Описание:</b> <i>{desc}</i><br>"
+  help_config_title: "<b>⚙️ | Конфигурация:</b><br>"
+  help_config_item: "    ⬥ <code>{key}</code>: <i>{desc}</i> (Текущее: <code>{val}</code>)<br>"
+  help_commands_title: "<b>🛠 | Команды:</b><br>"
+  help_command_item: " • <code>{prefix}{cmd}</code> — <i>{desc}</i><br>"
+  core_frozen: "Модули ядра заморожены в памяти и не могут быть изменены!"
+  dep_conflict: "<b>⚠️ Обнаружен конфликт зависимостей!</b><br>Модуль <code>{id}</code> требует пакеты, уже используемые другими модулями:<br>{conflicts}<br><br><b>Всё равно установить?</b>"
+  dep_confirm_yes: "✅ Установить"
+  dep_confirm_no: "❌ Отмена"
+  dep_install_failed: "Ошибка установки зависимостей: {err}"
+  dep_conflict_cancelled: "Установка отменена: конфликт зависимостей"
+  syntax_error: "Ошибка синтаксиса в коде модуля: {msg} (строка {line})"
+  no_meta: "Неверный модуль: не найден 'class Meta'!"
+  install_error_dep: "Ошибка установки зависимостей для <code>{name}</code>: {err}"
+  module_failed: "Модуль <code>{name}</code> не запустился. Зависимости установлены, проверь логи."
+  zip_no_root: "Zip должен содержать корневую директорию (имя модуля)"
+  zip_no_init: "Неверный zip-модуль: '__init__.py' не найден в корневой директории"
+  module_exists: "Модуль '{name}' уже существует!"
+  invalid_zip: "Неверный zip-файл!"
+  not_in_repo: "Модуль '{target}' не найден в репозиториях"
+  no_target: "Не указан модуль или код для установки!"
+  module_not_found: "Модуль '{name}' не найден!"
+  not_file: "Это не файл!"
+
+module:
+  no_description: "Нет описания"
+  no_description_available: "Описание недоступно"
+
+security:
+  core_import: "Импорт ядра запрещён: {name}"
+  memory_access: "Доступ к памяти запрещён"
+  subprocess: "Subprocess запрещён для сторонних модулей"
+  write_access: "Доступ на запись запрещён"
+  forbidden_attr: "Запрещённый атрибут '{attr}'"
+  forbidden_import: "Запрещённый импорт '{name}'"
+  eval_forbidden: "{name}() запрещён"
+  getattr_bypass: "попытка обхода getattr через '{name}'"
+  syntax_error: "Синтаксическая ошибка"
+  no_access: "нет"
+  temp_expired: "⏰ | {name}, ваше время истекло. теперь вы не можете юзать команду .{cmd}"
+
+log:
+  format: "<pre><code>{text}</code></pre>"
+
+main:
+  welcome: "👋 | Это <b>MXUserbot</b>. Спасибо за установку!<br>🔖 | <b>Префикс по умолчанию</b> [.]<br>┗ .set_prefix 'any_symbol'<br>🤔 | <u><b>Начало работы</b></u><br><ol><li>[Опционально] Подтвердите бота через SAS verification</li><li><code>help</code> — список всех команд</li></ol>📦 | <u><b>Модули</b></u><br><ol><li><code>ms &lt;name&gt;</code> — поиск модулей</li><li><code>mdl &lt;name&gt;</code> — установить модуль</li><li><code>unmd &lt;name&gt;</code> — удалить модуль</li><li><code>addrepo &lt;url&gt;</code> — добавить репозиторий</li><li><code>cfg &lt;module&gt; &lt;key&gt; &lt;value&gt;</code> — настроить модуль</li></ol>🌌 | <a href='https://matrix.to/#/#MxUserbot:matrix.org'>#MxUserbot:matrix.org</a>"
+  bot_started: "🚀 <b>Бот запущен.</b> Загружено <code>{count}</code> модулей."
+  db_access_denied: "Сторонние модули не могут напрямую обращаться к базе данных"
+  load_errors: "⚠️ <b>Модули не загрузились:</b><br>{errors}"
+
+lang:
+  switched: "✅ <b>Язык переключён на</b> <code>{code}</code>"
+  not_found: "❌ <b>Язык</b> <code>{code}</code> <b>не найден.</b> Доступно: {list}"
+  current: "🌐 <b>Текущий язык:</b> {code}"
+  available: "<b>Доступно:</b> {list}"

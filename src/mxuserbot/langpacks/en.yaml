@@ -1,0 +1,69 @@
+# ©️ Pasha Hatsune, 2025-2026
+# This file is a part of MXUserbot
+# 🌐 https://github.com/MxUserBot/MXUserbot
+# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
+
+callback:
+  config_required: "❌ <b>Config required:</b> {name}<br>Key <code>{key}</code> ({desc}) is empty.<br>Use: <code>{prefix}cfg {name} {key} [value]</code>"
+  usage: "ℹ️ <b>Usage:</b> <code>{prefix}{cmd} {usage}</code>"
+  error: "❌ <b>Error:</b> <code>{error}</code>"
+
+loader:
+  help_name: "<b>📦 | {name}</b>"
+  help_name_version: " <i>v{version}</i>"
+  help_desc: "<b>ℹ️ | Description:</b> <i>{desc}</i><br>"
+  help_config_title: "<b>⚙️ | Configuration:</b><br>"
+  help_config_item: "    ⬥ <code>{key}</code>: <i>{desc}</i> (Current: <code>{val}</code>)<br>"
+  help_commands_title: "<b>🛠 | Commands:</b><br>"
+  help_command_item: " • <code>{prefix}{cmd}</code> — <i>{desc}</i><br>"
+  core_frozen: "Core modules are frozen in memory and cannot be modified!"
+  dep_conflict: "<b>⚠️ Dependency conflict detected!</b><br>Module <code>{id}</code> requires packages already used by other modules:<br>{conflicts}<br><br><b>Install anyway?</b>"
+  dep_confirm_yes: "✅ Install"
+  dep_confirm_no: "❌ Cancel"
+  dep_install_failed: "Dependency installation failed: {err}"
+  dep_conflict_cancelled: "Installation cancelled: dependency conflict"
+  syntax_error: "Syntax error in module code: {msg} (line {line})"
+  no_meta: "Invalid module: 'class Meta' not found!"
+  install_error_dep: "Dependency installation failed for <code>{name}</code>: {err}"
+  module_failed: "Module <code>{name}</code> failed to start. Dependencies installed, check bot logs."
+  zip_no_root: "Zip must contain a root directory (the module name)"
+  zip_no_init: "Invalid zip module: '__init__.py' not found in the root directory"
+  module_exists: "Module '{name}' already exists!"
+  invalid_zip: "Invalid zip file!"
+  not_in_repo: "Module '{target}' not found in any repository"
+  no_target: "No target or code provided for installation!"
+  module_not_found: "Module '{name}' not found!"
+  not_file: "Is not file!"
+
+module:
+  no_description: "No description"
+  no_description_available: "No description available"
+
+security:
+  core_import: "Core import forbidden: {name}"
+  memory_access: "Memory access denied"
+  subprocess: "Subprocess is forbidden for community modules"
+  write_access: "Write access denied"
+  forbidden_attr: "Forbidden attribute '{attr}'"
+  forbidden_import: "Forbidden import '{name}'"
+  eval_forbidden: "{name}() is forbidden"
+  getattr_bypass: "getattr bypass attempt for '{name}'"
+  syntax_error: "Syntax Error"
+  no_access: "no"
+  temp_expired: "⏰ | {name}, your time has expired. You can no longer use .{cmd}"
+
+log:
+  format: "<pre><code>{text}</code></pre>"
+
+main:
+  welcome: "👋 | This is <b>MXUserbot</b>. Thanks for installing!<br>🔖 | <b>Default prefix</b> [.]<br>┗ .set_prefix 'any_symbol'<br>🤔 | <u><b>Getting started</b></u><br><ol><li>[Optional] Verify your bot via SAS verification</li><li><code>help</code> — list all commands</li></ol>📦 | <u><b>Modules</b></u><br><ol><li><code>ms &lt;name&gt;</code> — search modules</li><li><code>mdl &lt;name&gt;</code> — install module</li><li><code>unmd &lt;name&gt;</code> — remove module</li><li><code>addrepo &lt;url&gt;</code> — add community repo</li><li><code>cfg &lt;module&gt; &lt;key&gt; &lt;value&gt;</code> — config module</li></ol>🌌 | <a href='https://matrix.to/#/#MxUserbot:matrix.org'>#MxUserbot:matrix.org</a>"
+  bot_started: "🚀 <b>Bot started.</b> Loaded <code>{count}</code> modules."
+  db_access_denied: "Community modules cannot access database directly"
+  load_errors: "⚠️ <b>Modules failed to load:</b><br>{errors}"
+
+lang:
+  switched: "✅ <b>Language switched to</b> <code>{code}</code>"
+  not_found: "❌ <b>Language</b> <code>{code}</code> <b>not found.</b> Available: {list}"
+  current: "🌐 <b>Current language:</b> {code}"
+  available: "<b>Available:</b> {list}"

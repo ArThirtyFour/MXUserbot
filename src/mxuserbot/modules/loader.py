@@ -275,7 +275,7 @@ class LoaderModule(loader.Module):
 
             async def _install(ctx):
                 await ctx.close()
-                if await self.repo.install(**install_kw):
+                if await self.repo.install(**install_kw, event=event):
                     await utils.answer(mx, self.strings["done"].format(name=fname), edit_id=status_id)
                     await self.loader.show_module_help(mx, event, fname)
                 else:
@@ -284,7 +284,7 @@ class LoaderModule(loader.Module):
             if not await self._security_gate(mx, event, payload, False, is_file=True, on_confirm=_install):
                 return
 
-            if await self.repo.install(**install_kw):
+            if await self.repo.install(**install_kw, event=event):
                 await utils.answer(mx, self.strings["done"].format(name=fname), edit_id=status_id)
                 await self.loader.show_module_help(mx, event, fname)
             else:
@@ -303,7 +303,7 @@ class LoaderModule(loader.Module):
         async def _install(ctx):
             await ctx.close()
             await utils.answer(mx, self.strings["downloading"], edit_id=status_id)
-            if await self.repo.install(target=payload.target):
+            if await self.repo.install(target=payload.target, event=event):
                     filename = url.split("/")[-1]
                     if not filename.endswith((".py", ".zip")): filename += ".py"
                     await utils.answer(mx, self.strings["done"].format(name=filename), edit_id=status_id)
@@ -315,7 +315,7 @@ class LoaderModule(loader.Module):
             return
 
         await utils.answer(mx, self.strings["downloading"], edit_id=status_id)
-        if await self.repo.install(target=payload.target):
+        if await self.repo.install(target=payload.target, event=event):
             filename = url.split("/")[-1]
             if not filename.endswith((".py", ".zip")): filename += ".py"
             await utils.answer(mx, self.strings["done"].format(name=filename), edit_id=status_id)
@@ -369,8 +369,12 @@ class LoaderModule(loader.Module):
     async def reload(self, mx, event: MessageEvent):
         """Reload everything modules!"""
         status_id = await utils.answer(mx, self.strings["reloading"])
-        await self.loader.register_all(mx)
-        await utils.answer(mx, self.strings["reloaded"].format(count=len(mx.active_modules)), edit_id=status_id)
+        errors = await self.loader.register_all(mx)
+        msg = self.strings["reloaded"].format(count=len(mx.active_modules))
+        if errors:
+            error_lines = [f"  ⚠️ <b>{e['name']}</b>: <code>{utils.escape_html(e['error'])}</code>" for e in errors]
+            msg += "<br><br><b>Failed modules:</b><br>" + "<br>".join(error_lines)
+        await utils.answer(mx, msg, edit_id=status_id)
 
 
     @loader.command(security=loader.OWNER)

@@ -13,10 +13,13 @@ from loguru import logger
 from mxc import utils
 from mxc.types import Document
 
+from .langs import STRINGS
+
 
 class MXLog:
     def __init__(self, mx):
         self.mx = mx
+        self.strings = STRINGS
         self.queue = asyncio.Queue()
         self._worker_task = asyncio.create_task(self._worker())
         self._last_send = 0.0
@@ -72,7 +75,7 @@ class MXLog:
                     else:
                         await utils.answer(
                             self.mx,
-                            text=f"<pre><code>{text}</code></pre>",
+                            text=self.strings("log.format", text=text),
                             room_id=room_id,
                         )
                     self._last_send = time.monotonic()

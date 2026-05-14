@@ -14,6 +14,8 @@ from loguru import logger
 
 from mxc import utils
 
+from .langs import STRINGS
+
 
 class ModuleConfig:
     def __init__(self, getter_func, setter_func, schema: dict):
@@ -63,9 +65,6 @@ class ModuleConfig:
         except Exception:
             return False
 
-    def get_description(self, key):
-        return self._schema[key].description if key in self._schema else ""
-
     def get_missing_required(self) -> typing.Optional[str]:
         for key, cfg in self._schema.items():
             if cfg.required:
@@ -75,7 +74,7 @@ class ModuleConfig:
         return None
 
     def get_description(self, key: str) -> str:
-        return self._schema[key].description if key in self._schema else "No description"
+        return self._schema[key].description if key in self._schema else STRINGS("module.no_description")
 
 
 class ConfigValue:
@@ -151,7 +150,7 @@ class Module(ABC):
             self._commands[cmd_name] = getattr(self, func.__name__)
 
     def _help(self):
-        return self.strings.get("description", "No description available")
+        return self.strings.get("description", STRINGS("module.no_description_available"))
 
     @property
     def commands(self):

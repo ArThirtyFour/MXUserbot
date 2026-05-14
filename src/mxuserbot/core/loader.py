@@ -29,8 +29,11 @@ from mautrix.crypto.attachments import decrypt_attachment
 from mautrix.types import EncryptedEvent, EventType, MessageType
 
 from mxc import utils
+from mxc.types import DownloadMeta, EmojiButton
+from mxc.utils.keyboard import EmojiKeyBoard
 from .security import ALL, EVERYONE, OWNER, SUDO, ScopedDatabase, COMM_MARKERS
 from .module import ConfigValue, Module
+from .langs import STRINGS
 
 _MODULE_NAME_BY_HASH: typing.Dict[str, str] = {}
 
@@ -184,19 +187,26 @@ def tds(cls):
 class Loader:
     def __init__(self, db_wrapper):
         self._db = db_wrapper
+        self.strings = STRINGS
         self.active_modules: typing.Dict[str, object] = {}
         self.module_path = Path(__file__).resolve().parents[2] / 'mxuserbot'
         self.core_path = self.module_path / "modules"
         self.community_path = self.module_path / "community"
 
         self._background_tasks: typing.Set[asyncio.Task] = set()
-        self.command_registry: typing.Dict[str, typing.Dict[str, typing.Any]] = {} 
+        self.command_registry: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
+        self._load_errors: typing.List[typing.Dict[str, str]] = []
+
+    def _record_error(self, name: str, error: str) -> None:
+        self._load_errors.append({"name": name, "error": str(error)}) 
 
 
     async def register_all(
         self,
         bot
-    ) -> None:
+    ) -> List[Dict[str, str]]:
+        self._load_errors = []
+        
         for p in [self.core_path, self.community_path]:
             p.mkdir(parents=True, exist_ok=True)
 
@@ -213,6 +223,7 @@ class Loader:
         )
 
         logger.info(f"Load modules: {len(self.active_modules)}.")
+        return self._load_errors
 
 
     async def _load_from_directory(
@@ -241,32 +252,35 @@ class Loader:
             if not mod:
                 return
 
-            prefix = await utils.get_prefix(mx)
+            _raw_prefix = await utils.get_prefix(mx)
+            prefix = next((str(p) for p in _raw_prefix if p), "")
+
             meta = getattr(mod, "Meta", None)
             name = getattr(meta, "name", mod_name)
             desc = getattr(meta, "description", "—")
             version = getattr(meta, "version", "")
 
-            lines = [f"<b>📦 | {name}</b>"]
+            lines = [self.strings("loader.help_name", name=name)]
             if version:
-                lines[0] += f" <i>v{version}</i>"
-            lines.append(f"<b>ℹ️ | Description:</b> <i>{desc}</i><br>")
+                lines[0] += self.strings("loader.help_name_version", version=version)
+            lines.append(self.strings("loader.help_desc", desc=desc))
 
             if hasattr(mod, "config") and hasattr(mod.config, "_schema"):
-                lines.append("<b>⚙️ | Configuration:</b><br>")
+                lines.append(self.strings("loader.help_config_title"))
                 for key, cfg_val in mod.config._schema.items():
                     lines.append(
-                        f"    ⬥ <code>{key}</code>: "
-                        f"<i>{cfg_val.description or '—'}</i> "
-                        f"(Current: <code>{mod.config[key]}</code>)<br>"
+                        self.strings("loader.help_config_item",
+                            key=key,
+                            desc=cfg_val.description or "—",
+                            val=mod.config[key])
                     )
 
             commands = getattr(mod, "commands", {})
             if commands:
-                lines.append("<b>🛠 | Commands:</b><br>")
+                lines.append(self.strings("loader.help_commands_title"))
                 for cmd_name, func in commands.items():
                     cmd_desc = (func.__doc__ or "—").replace("<", "&lt;").replace(">", "&gt;")
-                    lines.append(f" • <code>{prefix}{cmd_name}</code> — <i>{cmd_desc}</i><br>")
+                    lines.append(self.strings("loader.help_command_item", prefix=prefix, cmd=cmd_name, desc=cmd_desc))
 
             await utils.answer(mx, "".join(lines), event=event)
 
@@ -299,6 +313,7 @@ class Loader:
             except Exception as e:
                 logger.error(f"[{path.stem}] Execution error: {e}")
                 sys.modules.pop(module_name, None)
+                self._record_error(path.stem, str(e))
                 return
 
             if not hasattr(module, 'Meta'):
@@ -357,8 +372,9 @@ class Loader:
             self._background_tasks.add(startup_task)
             startup_task.add_done_callback(self._background_tasks.discard)
 
-        except Exception:
+        except Exception as e:
             logger.exception(f"Error module import {path.name}")
+            self._record_error(path.stem, str(e))
 
 
     async def register_package(
@@ -480,8 +496,9 @@ class Loader:
             self._background_tasks.add(startup_task)
             startup_task.add_done_callback(self._background_tasks.discard)
 
-        except Exception:
+        except Exception as e:
             logger.exception(f"Error package import {pkg_dir.name}")
+            self._record_error(short_name, str(e))
             self._cleanup_package_modules(pkg_name)
 
 
@@ -489,7 +506,7 @@ class Loader:
         if is_core:
             def secure_setattr(obj, name, value):
                 if _is_community_in_stack():
-                    raise PermissionError("Core modules are frozen in memory and cannot be modified!")
+                    raise PermissionError(self.strings("loader.core_frozen"))
                 object.__setattr__(obj, name, value)
             cls.__setattr__ = secure_setattr
 
@@ -629,7 +646,9 @@ class Loader:
             
             logger.success(f"Module {name} is started!")
         except Exception as e:
-            raise e
+            logger.error(f"Module {name} startup failed: {e}")
+            self._record_error(name, str(e))
+            self.active_modules.pop(name, None)
 
     async def _cron_loop(self, mx, func, instance):
         try:
@@ -659,6 +678,7 @@ class Loader:
 class RepoManager:
     def __init__(self, mx, db, system_repo_url: str = "https://raw.githubusercontent.com/MxUserBot/mx-modules/main"):
         self.mx = mx
+        self.strings = STRINGS
         self.loader = mx.all_modules
         self.sys_repo = system_repo_url.rstrip("/")
         self.db = db
@@ -842,8 +862,9 @@ class RepoManager:
             stdout, stderr = await proc.communicate()
             
             if proc.returncode != 0:
-                logger.error(f"❌ UV ERROR: {stderr.decode('utf-8')}")
-                return False
+                err_msg = stderr.decode('utf-8').strip()
+                logger.error(f"❌ UV ERROR: {err_msg}")
+                raise RuntimeError(self.strings("loader.dep_install_failed", err=err_msg))
                 
             logger.success(f"✅ | dependencies installed success")
             return True
@@ -851,10 +872,67 @@ class RepoManager:
             raise e
 
 
+    async def check_dep_conflicts(
+        self,
+        deps: List[str],
+        module_id: str
+    ) -> List[str]:
+        state_str = await self.db.get("core", "dep_map")
+        dep_map = json.loads(state_str) if state_str else {}
+        conflicts = []
+        for dep in deps:
+            base = re.split(r'[<>=!~]', dep)[0].strip().lower()
+            owners = dep_map.get(base, [])
+            active = [o for o in owners if o != module_id and o in self.loader.active_modules]
+            if active:
+                conflicts.append(f"{dep} (used by: {', '.join(active)})")
+        return conflicts
+
+
+    async def _dep_conflict_poll(
+        self,
+        mx,
+        event,
+        module_id: str,
+        conflicts: List[str]
+    ) -> bool:
+        confirmed = asyncio.Event()
+        result = [False]
+
+        async def callback(ctx):
+            if ctx.payload == "yes":
+                result[0] = True
+            confirmed.set()
+
+        markup = EmojiKeyBoard(
+            rows=[[
+                EmojiButton(self.strings("loader.dep_confirm_yes"), "yes"),
+                EmojiButton(self.strings("loader.dep_confirm_no"), "no"),
+            ]],
+            callback=callback,
+        )
+
+        conflict_lines = "<br>".join(f"  ⚠️ <code>{c}</code>" for c in conflicts)
+        await utils.answer(
+            mx,
+            self.strings("loader.dep_conflict", id=module_id, conflicts=conflict_lines),
+            event=event,
+            reply_markup=markup,
+        )
+
+        try:
+            await asyncio.wait_for(confirmed.wait(), timeout=60)
+        except asyncio.TimeoutError:
+            return False
+
+        return result[0]
+
+
     async def _install_dependencies(
         self,
         module_id: str, 
-        deps: List[str]
+        deps: List[str],
+        event=None
     ) -> bool:
         if not deps:
             return True
@@ -862,7 +940,15 @@ class RepoManager:
         state_str = await self.db.get("core", "dep_map")
         dep_map = json.loads(state_str) if state_str else {}
         
+        if event:
+            conflicts = await self.check_dep_conflicts(deps, module_id)
+            if conflicts:
+                ok = await self._dep_conflict_poll(self.mx, event, module_id, conflicts)
+                if not ok:
+                    raise RuntimeError(self.strings("loader.dep_conflict_cancelled"))
+        
         to_install =[]
+        added = {}
         for dep in deps:
             base_dep = re.split(r'[<>=!~]', dep)[0].strip().lower()
             
@@ -871,13 +957,20 @@ class RepoManager:
             
             if module_id not in dep_map[base_dep]:
                 dep_map[base_dep].append(module_id)
+                added[base_dep] = True
             
             to_install.append(dep)
             
         if to_install:
-            success = await self._run_uv("install", to_install)
-            if not success:
-                raise RuntimeError("error installed dependencies...")
+            try:
+                await self._run_uv("install", to_install)
+            except Exception:
+                for base_dep in added:
+                    dep_map[base_dep] = [m for m in dep_map[base_dep] if m != module_id]
+                    if not dep_map[base_dep]:
+                        del dep_map[base_dep]
+                await self.db.set("core", "dep_map", json.dumps(dep_map))
+                raise
                 
         await self.db.set("core", "dep_map", json.dumps(dep_map))
         return True
@@ -905,15 +998,38 @@ class RepoManager:
         await self.db.set("core", "dep_map", json.dumps(dep_map))
 
 
+    @staticmethod
+    def _parse_deps_from_code(code: str) -> List[str]:
+        try:
+            tree = ast.parse(code)
+        except SyntaxError:
+            return []
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ClassDef) and node.name == "Meta":
+                deps = []
+                for stmt in node.body:
+                    if isinstance(stmt, ast.Assign):
+                        for t in stmt.targets:
+                            if getattr(t, 'id', '') == 'dependencies':
+                                if isinstance(stmt.value, (ast.List, ast.Tuple)):
+                                    deps = [
+                                        elt.value for elt in stmt.value.elts
+                                        if isinstance(elt, ast.Constant) and isinstance(elt.value, str)
+                                    ]
+                return deps
+        return []
+
+
     async def install_code(
         self,
         code: str,
-        filename: str
+        filename: str,
+        event=None
     ) -> bool:
         try:
             tree_node = ast.parse(code)
         except SyntaxError as se:
-            raise ValueError(f"Syntax error in module code: {se.msg} (line {se.lineno})")
+            raise ValueError(self.strings("loader.syntax_error", msg=se.msg, line=se.lineno))
 
         meta_node = None
         for node in ast.walk(tree_node):
@@ -922,18 +1038,9 @@ class RepoManager:
                 break
 
         if not meta_node:
-            raise ValueError("Invalid module: 'class Meta' not found!")
+            raise ValueError(self.strings("loader.no_meta"))
 
-        module_deps =[]
-        for stmt in meta_node.body:
-            if isinstance(stmt, ast.Assign):
-                for t in stmt.targets:
-                    if getattr(t, 'id', '') == 'dependencies':
-                        if isinstance(stmt.value, (ast.List, ast.Tuple)):
-                            module_deps =[
-                                elt.value for elt in stmt.value.elts 
-                                if isinstance(elt, ast.Constant) and isinstance(elt.value, str)
-                            ]
+        module_deps = self._parse_deps_from_code(code)
 
         if not filename.endswith(".py"): 
             filename += ".py"
@@ -941,10 +1048,17 @@ class RepoManager:
         
         if module_deps:
             logger.info(f"📦 | install {short_name} dependencies: {module_deps}....")
-            await self._install_dependencies(
-                short_name,
-                module_deps
-            )
+            try:
+                await self._install_dependencies(
+                    short_name,
+                    module_deps,
+                    event=event
+                )
+            except Exception as e:
+                short = filename.replace(".py", "").replace(".zip", "")
+                raise RuntimeError(
+                    self.strings("loader.install_error_dep", name=short, err=e)
+                )
         
         path = Path(self.loader.community_path) / filename
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -955,7 +1069,9 @@ class RepoManager:
         if path.stem not in self.mx.active_modules:
             await self._remove_dependencies(short_name)
             path.unlink(missing_ok=True)
-            raise ValueError("Module failed to start. Check bot logs.")
+            raise ValueError(
+                self.strings("loader.module_failed", name=short_name)
+            )
 
         return True
 
@@ -963,7 +1079,8 @@ class RepoManager:
     async def _install_zip(
         self,
         zip_bytes: bytes,
-        filename: str
+        filename: str,
+        event=None
     ) -> bool:
         temp_dir = Path(tempfile.mkdtemp())
 
@@ -976,42 +1093,27 @@ class RepoManager:
 
             extracted_dirs = [d for d in temp_dir.iterdir() if d.is_dir()]
             if not extracted_dirs:
-                raise ValueError("Zip must contain a root directory (the module name)")
+                raise ValueError(self.strings("loader.zip_no_root"))
 
             pkg_dir = extracted_dirs[0]
             init_file = pkg_dir / "__init__.py"
             if not init_file.exists():
-                raise ValueError("Invalid zip module: '__init__.py' not found in the root directory")
+                raise ValueError(self.strings("loader.zip_no_init"))
 
             init_code = init_file.read_text(encoding="utf-8")
-            tree_node = ast.parse(init_code)
-
-            meta_node = None
-            for node in ast.walk(tree_node):
-                if isinstance(node, ast.ClassDef) and node.name == "Meta":
-                    meta_node = node
-                    break
-
-            if not meta_node:
-                raise ValueError("Invalid zip module: 'class Meta' not found in __init__.py!")
-
-            module_deps = []
-            for stmt in meta_node.body:
-                if isinstance(stmt, ast.Assign):
-                    for t in stmt.targets:
-                        if getattr(t, 'id', '') == 'dependencies':
-                            if isinstance(stmt.value, (ast.List, ast.Tuple)):
-                                module_deps = [
-                                    elt.value for elt in stmt.value.elts
-                                    if isinstance(elt, ast.Constant) and isinstance(elt.value, str)
-                                ]
+            module_deps = self._parse_deps_from_code(init_code)
 
             target_dir = Path(self.loader.community_path) / pkg_dir.name
             if target_dir.exists():
-                raise ValueError(f"Module '{pkg_dir.name}' already exists!")
+                raise ValueError(self.strings("loader.module_exists", name=pkg_dir.name))
 
             if module_deps:
-                await self._install_dependencies(pkg_dir.name, module_deps)
+                try:
+                    await self._install_dependencies(pkg_dir.name, module_deps, event=event)
+                except Exception as e:
+                    raise RuntimeError(
+                        self.strings("loader.install_error_dep", name=pkg_dir.name, err=e)
+                    )
 
             shutil.copytree(str(pkg_dir), str(target_dir))
 
@@ -1020,12 +1122,12 @@ class RepoManager:
             if target_dir.name not in self.mx.active_modules:
                 await self._remove_dependencies(pkg_dir.name)
                 shutil.rmtree(str(target_dir), ignore_errors=True)
-                raise ValueError("Zip module failed to start. Check bot logs.")
+                raise ValueError(self.strings("loader.module_failed", name=pkg_dir.name))
 
             return True
 
         except zipfile.BadZipFile:
-            raise ValueError("Invalid zip file!")
+            raise ValueError(self.strings("loader.invalid_zip"))
         finally:
             shutil.rmtree(str(temp_dir), ignore_errors=True)
 
@@ -1034,32 +1136,33 @@ class RepoManager:
             self, 
             target: Optional[str] = None, 
             code: Optional[str] = None, 
-            filename: Optional[str] = None
+            filename: Optional[str] = None,
+            event=None,
         ) -> bool:
             if target:
                 url, source = await self.resolve_and_download(target)
                 if not url:
-                    raise ValueError(f"Module '{target}' not found in any repository")
+                    raise ValueError(self.strings("loader.not_in_repo", target=target))
 
                 logger.info(f"⬇️ | Downloading module: {url}")
                 if url.endswith(".zip"):
                     raw = await utils.request(url, return_type="bytes")
                     filename = url.split("/")[-1]
-                    return await self._install_zip(raw, filename)
+                    return await self._install_zip(raw, filename, event=event)
                 else:
                     code = await utils.request(url, return_type="text")
                     filename = url.split("/")[-1]
 
             if not code or not filename:
-                raise ValueError("No target or code provided for installation!")
+                raise ValueError(self.strings("loader.no_target"))
 
             if isinstance(code, bytes) and filename.endswith(".zip"):
-                return await self._install_zip(code, filename)
+                return await self._install_zip(code, filename, event=event)
 
             if isinstance(code, bytes):
                 code = code.decode("utf-8", errors="ignore")
 
-            return await self.install_code(code, filename)
+            return await self.install_code(code, filename, event=event)
 
 
     async def uninstall(
@@ -1081,7 +1184,7 @@ class RepoManager:
                     break
 
         if not actual_name:
-            raise ValueError(f"Module '{name}' not found!")
+            raise ValueError(self.strings("loader.module_not_found", name=name))
 
         await self.loader.unload_module(actual_name, self.mx)
 
@@ -1096,6 +1199,7 @@ class RepoManager:
         await self._remove_dependencies(actual_name)
         logger.success(f"Module {actual_name} unloaded")
 
+
     async def get_file_content(
         self,
         event: Any
@@ -1107,16 +1211,16 @@ class RepoManager:
             content = event.content
 
         if content.msgtype != MessageType.FILE:
-            raise ValueError("Is not file!")
+            raise ValueError(self.strings("loader.not_file"))
 
         if content.file:
-            ciphertext = await self.mx.client.download_media(content.file.url)
+            ciphertext = await utils.download(self.mx, meta=DownloadMeta(url=content.file.url))
             data = decrypt_attachment(
                 ciphertext, content.file.key.key, 
                 content.file.hashes.get("sha256"), content.file.iv
             )
         else:
-            data = await self.mx.client.download_media(content.url)
+            data = await utils.download(self.mx, meta=DownloadMeta(url=content.url))
             
         return content.body, data
 

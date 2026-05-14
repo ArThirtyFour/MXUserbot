@@ -10,6 +10,7 @@ import logging
 import sys
 import time
 import traceback
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 from loguru import logger
@@ -35,6 +36,7 @@ from .core import (
     Loader,
     MXUS,
 )
+from .core.langs import STRINGS, init as lang_init
 
 
 
@@ -60,6 +62,7 @@ class MXBotInterface:
 
     def __init__(self, bot: 'MXUserBot'):
         self._bot = bot
+        self.strings = STRINGS
         self.version = bot.version
 
     @property
@@ -97,7 +100,7 @@ class MXBotInterface:
     @property
     def _db(self) -> Database:
         if self._bot.security is not None and self._bot.security._is_community_caller():
-            raise PermissionError("Community modules cannot access database directly")
+            raise PermissionError(self.strings("main.db_access_denied"))
         return self._bot._db
 
     @property
@@ -144,6 +147,37 @@ class MXUserBot(Program):
     ) -> Any:
         return await self._db.get("core", key, default)
 
+    async def _set_core_conf(
+        self,
+        key: str,
+        value: Any = None
+    ) -> Any:
+        return await self._db.set("core", key, value)
+
+
+    async def _upload_assets(self) -> None:
+        assets_dir = Path(__file__).resolve().parent.parent.parent / "assets"
+
+        if not await self._get_core_conf("banner_url"):
+            banner = assets_dir / "banner.webp"
+            if banner.exists():
+                try:
+                    url = await utils.upload(self.interface, banner.read_bytes(), mime_type="image/webp")
+                    await self._db.set("core", "banner_url", url)
+                    self.log.success(f"Banner uploaded: {url}")
+                except Exception as e:
+                    self.log.error(f"Banner upload failed: {e}")
+
+        if not await self._get_core_conf("room_avatar_url"):
+            avatar = assets_dir / "promo" / "miku.gif"
+            if avatar.exists():
+                try:
+                    url = await utils.upload(self.interface, avatar.read_bytes(), mime_type="image/gif")
+                    await self._db.set("core", "room_avatar_url", url)
+                    self.log.success(f"Room avatar uploaded: {url}")
+                except Exception as e:
+                    self.log.error(f"Room avatar upload failed: {e}")
+
 
     def _setup_loguru(
         self
@@ -180,48 +214,36 @@ class MXUserBot(Program):
 
             target_name = "[LOGS] | MX-USERBOT"
 
-
             if not log_room_id:
-                self.log.warning("Room not found.. Create new..")
-                avatar = "mxc://matrix.org/hokwPmIkfLsoALRksGgAaYOe"
-                log_room_id = await self.client.create_room(
+                avatar = await self._get_core_conf("room_avatar_url")
+                owners_to_invite = [o for o in self.security.owners if o != self.client.mxid] if self.security.owners else None
+                log_room_id = await utils.create_room(
+                    self.interface,
                     name=target_name,
                     is_direct=True,
-                    initial_state=[
-                        {
-                            "type": "m.room.avatar",
-                            "content": {"url": avatar}
-                        }
-                    ]
+                    invitees=owners_to_invite,
+                    avatar_url=avatar
+
                 )
-                await self.client.join_room(log_room_id)
+                await utils.join_room(self.interface, log_room_id)
                 msg_id = await utils.answer(
                     self.interface,
-                    "👋 | This is <b>MXUserbot</b>. Thanks for installing!<br>"
-                    "🔖 | <b>Default prefix</b> [.]<br>┗ .set_prefix 'any_symbol'<br>"
-                    "🤔 | <u><b>Getting started</b></u><br>"
-                    "<ol>"
-                    "<li>[Optional] Verify your bot via SAS verification</li>"
-                    "<li><code>help</code> — list all commands</li>"
-                    "</ol>"
-                    "📦 | <u><b>Modules</b></u><br>"
-                    "<ol>"
-                    "<li><code>ms &lt;name&gt;</code> — search modules</li>"
-                    "<li><code>mdl &lt;name&gt;</code> — install module</li>"
-                    "<li><code>unmd &lt;name&gt;</code> — remove module</li>"
-                    "<li><code>addrepo &lt;url&gt;</code> — add community repo</li>"
-                    "<li><code>cfg &lt;module&gt; &lt;key&gt; &lt;value&gt;</code> — config module</li>"
-                    "</ol>"
-                    "🌌 | <a href='https://matrix.to/#/#MxUserbot:matrix.org'>#MxUserbot:matrix.org</a>",
+                    STRINGS("main.welcome"),
                     room_id=log_room_id
                 )
-                await utils.pin_room(self.interface, log_room_id)
                 await utils.pin(self.interface, log_room_id, msg_id)
 
             await self._db.set("core", "log_room_id", str(log_room_id))
+            self.log_room = str(log_room_id)
             self.log.success(f"Log room ready: {log_room_id}")
         except Exception as e:
             self.log.error(f"Log room setup failed: {e}")
+
+    async def _recreate_log_room(self) -> None:
+        self.log.warning("Log room lost, recreating...")
+        self.log_room = None
+        await self._db.set("core", "log_room_id", None)
+        await self._init_logs_background()
 
 
     def prepare(self) -> None:
@@ -284,8 +306,10 @@ class MXUserBot(Program):
                     await asyncio.sleep(5)
 
             await self.security.init_security()
-
+            await lang_init(self._get_core_conf, self._set_core_conf)
+            await self._upload_assets()
             await self._setup_logs()
+
             from .core.log import MXLog
             self.matrix_sink = MXLog(self)
             logger.add(self.matrix_sink.write, level="ERROR")
@@ -297,7 +321,24 @@ class MXUserBot(Program):
                 self.log.error("Module loading timed out")
                 raise
             self.active_modules = self.all_modules.active_modules
-            
+
+            load_errors = self.all_modules._load_errors
+            if load_errors:
+                errors_list = "<br>".join(
+                    f"⬥ <code>{err['name']}</code>: {err['error']}" for err in load_errors
+                )
+                if self.log_room:
+                    try:
+                        await utils.answer(
+                            self.interface,
+                            STRINGS("main.load_errors", errors=errors_list),
+                            room_id=self.log_room,
+                        )
+                    except Exception:
+                        pass
+                else:
+                    self.log.warning(f"Module load errors: {load_errors}")
+
             self._prefixes = await self._get_core_conf("prefix")
             if not self._prefixes:
                 await self._db.set(owner="core", key="prefix", value=".")
@@ -343,6 +384,17 @@ class MXUserBot(Program):
                 await asyncio.wait_for(sync_started.wait(), timeout=60)
                 self.log.success(f"Userbot Started: {self.client.mxid}")
                 self._ready.set()
+
+                total = len(self.active_modules)
+                if self.log_room:
+                    try:
+                        await utils.answer(
+                            self.interface,
+                            STRINGS("main.bot_started", count=total),
+                            room_id=self.log_room,
+                        )
+                    except Exception:
+                        pass
             except asyncio.TimeoutError:
                 self.log.error("Server timeout")
 

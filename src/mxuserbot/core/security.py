@@ -15,6 +15,8 @@ from mautrix.errors import MatrixConnectionError
 
 from mxc import utils
 
+from .langs import STRINGS
+
 
 class SecLevel(IntFlag):
     OWNER = 1
@@ -79,6 +81,7 @@ class ScopedDatabase:
 class MXUS:
     def __init__(self, bot):
         self.bot = bot
+        self.strings = STRINGS
         self._db = bot._db
         self.owners = set()
         self.sudos = set()
@@ -184,27 +187,27 @@ class MXUS:
             if event == "import":
                 blocked = ["mxuserbot.modules.core", "mxuserbot.core.security"]
                 if any(args[0] == b or args[0].startswith(f"{b}.") for b in blocked):
-                    raise PermissionError(f"Core import forbidden: {args[0]}")
+                    raise PermissionError(self.strings("security.core_import", name=args[0]))
 
             if event.startswith("ctypes"):
-                raise PermissionError("Memory access denied")
+                raise PermissionError(self.strings("security.memory_access"))
 
             if event in ("subprocess.Popen",):
-                raise PermissionError("Subprocess is forbidden for community modules")
+                raise PermissionError(self.strings("security.subprocess"))
 
             paths = _extract_paths(event, args)
             if paths:
                 joined = " ".join(p.replace("\\", "/").lower() for p in paths)
                 if any(r in joined for r in fs_blocklist):
-                    raise PermissionError("no")
+                    raise PermissionError(self.strings("security.no_access"))
                 if event in ("open", "os.open") and len(args) > 1:
                     mode = args[1]
                     import os as _os
                     write_flags = _os.O_WRONLY | _os.O_RDWR | _os.O_CREAT | _os.O_TRUNC | _os.O_APPEND
                     if isinstance(mode, int) and (mode & write_flags):
-                        raise PermissionError("Write access denied")
+                        raise PermissionError(self.strings("security.write_access"))
                     if isinstance(mode, str) and any(m in mode for m in "wax+"):
-                        raise PermissionError("Write access denied")
+                        raise PermissionError(self.strings("security.write_access"))
         
         sys.addaudithook(core_audit_hook)
 
@@ -218,33 +221,33 @@ class MXUS:
             tree = ast.parse(source)
             for node in ast.walk(tree):
                 if isinstance(node, ast.Attribute) and node.attr in self.all_forbidden:
-                    raise PermissionError(f"Forbidden attribute '{node.attr}'")
+                    raise PermissionError(self.strings("security.forbidden_attr", attr=node.attr))
                 
                 if isinstance(node, ast.Import):
                     for alias in node.names:
                         base_module = alias.name.split('.')[0]
                         if base_module in self.forbidden_imports:
-                            raise PermissionError(f"Forbidden import '{alias.name}'")
+                            raise PermissionError(self.strings("security.forbidden_import", name=alias.name))
                 
                 if isinstance(node, ast.ImportFrom) and node.module:
                     base_module = node.module.split('.')[0]
                     if base_module in self.forbidden_imports:
-                        raise PermissionError(f"Forbidden import '{node.module}'")
+                        raise PermissionError(self.strings("security.forbidden_import", name=node.module))
 
                 if isinstance(node, ast.Call):
                     if isinstance(node.func, ast.Name) and node.func.id in {"eval", "exec", "__import__"}:
-                        raise PermissionError(f"{node.func.id}() is forbidden")
+                        raise PermissionError(self.strings("security.eval_forbidden", name=node.func.id))
                     if isinstance(node.func, ast.Attribute):
                         if node.func.attr in {"eval", "exec", "__import__"}:
-                            raise PermissionError(f"{node.func.attr}() is forbidden")
+                            raise PermissionError(self.strings("security.eval_forbidden", name=node.func.attr))
                         if node.func.attr == "getattr":
                             for arg in node.args:
                                 if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
                                     if arg.value in self.all_forbidden:
-                                        raise PermissionError(f"getattr bypass attempt for '{arg.value}'")
+                                        raise PermissionError(self.strings("security.getattr_bypass", name=arg.value))
 
         except SyntaxError:
-            raise PermissionError("Syntax Error")
+            raise PermissionError(self.strings("security.syntax_error"))
 
 
     def is_owner(
@@ -293,7 +296,7 @@ class MXUS:
             if not room_id or not target:
                 continue
             name = target.split(":")[0]
-            text = f"⏰ | {name}, ваше время истекло. теперь вы не можете юзать команду .{cmd_name}"
+            text = self.strings("security.temp_expired", name=name, cmd=cmd_name)
             try:
                 await utils.answer(self.bot, text, room_id=room_id)
             except Exception:
@@ -346,7 +349,7 @@ class MXUS:
     
     def _get_key(self) -> bytes:
         if self._is_community_caller():
-            raise PermissionError("no")
+            raise PermissionError(self.strings("security.no_access"))
 
         import os
         from cryptography.fernet import Fernet
@@ -367,7 +370,7 @@ class MXUS:
 
     def _get_pickle_key(self) -> str:
         if self._is_community_caller():
-            raise PermissionError("no")
+            raise PermissionError(self.strings("security.no_access"))
         return ensure_pickle_key()
 
 
