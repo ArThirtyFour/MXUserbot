@@ -119,7 +119,7 @@ class MXUserBot(Program):
             name='MXUserbot',
             description="MXUserbot - Matrix Userbot.",
             command="-",
-            version="2.4 | STABLE",
+            version="2.5 | STABLE",
             config_class=Config
         )
         self.fsm = FSM()
