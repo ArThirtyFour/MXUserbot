@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>✨ | MXUserbot | ✨</h1>
+  <h1><img src="assets/promo/sparkles.gif" width="48" height="48"> MXUserbot <img src="assets/promo/sparkles.gif" width="48" height="48"></h1>
   <img width="1376" height="768" alt="result" src="assets/banner.webp"/>
   <br>
 </div>
@@ -20,7 +20,7 @@
 </p>
 
 <hr>
-<h3>✨ | Feature</h3>
+<h3><img src="assets/promo/sparkles.gif" width="32" height="32"> Feature</h3>
 
 <table cellspacing="0" width="100%">
  <tr>
@@ -51,7 +51,7 @@
  </tr>
 </table>
 
-<h2>Installation</h2>
+<h2><img src="assets/promo/install.gif" height="24"> Installation</h2>
 
 <table cellspacing="0" cellpadding="0" style="border-collapse: collapse; width: 100%;">
   <tr>
@@ -93,25 +93,19 @@ uv run -m src.mxuserbot</code></pre>
 
 <hr>
 
-<h3>Credits</h3>
-<ul>
-  <li><b>@ArThirtyFour</b> — thanks for help with the code/banner.</li>
-  <li><b>@maseckt</b> — thanks for help with the code/videos.</li>
-</ul>
 
+<div class="emergency-box">
+    <h2><img src="assets/promo/alert.gif" width="40" height="40"> Disclaimer</h2>
+    <p align="justify">
+      This software is provided <b>"as is"</b>, without warranty of any kind, express or implied. By using this userbot, you acknowledge that:
+    </p>
+    <ul>
+      <li><b>Full Responsibility:</b> You are solely responsible for your actions and any consequences resulting from the use of this software.</li>
+      <li><b>No Liability:</b> The developer shall not be held liable for any damages, including but not limited to account bans, data loss, or legal issues.</li>
+      <li><b>Strict Prohibition:</b> Use of this bot for fraudulent activities, spam, or any actions that violate terms of service or local laws is strictly prohibited.</li>
+    </ul>
+</div>
 
-
-<h2>Disclaimer</h2>
-<p align="justify">
-  This software is provided <b>"as is"</b>, without warranty of any kind, express or implied. By using this userbot, you acknowledge that:
-</p>
-<ul>
-  <li><b>Full Responsibility:</b> You are solely responsible for your actions and any consequences resulting from the use of this software.</li>
-  <li><b>No Liability:</b> The developer shall not be held liable for any damages, including but not limited to account bans, data loss, or legal issues.</li>
-  <li><b>Strict Prohibition:</b> Use of this bot for fraudulent activities, spam, or any actions that violate terms of service or local laws is strictly prohibited.</li>
-</ul>
-
-<hr>
 
 <div align="center">
     <img width="10%" src="assets/promo/miku.gif">
