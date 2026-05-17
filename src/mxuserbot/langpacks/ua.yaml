@@ -1,0 +1,69 @@
+# ©️ Pasha Hatsune, 2025-2026
+# This file is a part of MXUserbot
+# 🌐 https://github.com/MxUserBot/MXUserbot
+# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
+
+callback:
+  config_required: "❌ <b>Потрібне налаштування:</b> {name}<br>Ключ <code>{key}</code> ({desc}) порожній.<br>Використовуйте: <code>{prefix}cfg {name} {key} [value]</code>"
+  usage: "ℹ️ <b>Використання:</b> <code>{prefix}{cmd} {usage}</code>"
+  error: "❌ <b>Помилка:</b> <code>{error}</code>"
+
+loader:
+  help_name: "<b>📦 | {name}</b>"
+  help_name_version: " <i>v{version}</i>"
+  help_desc: "<b>ℹ️ | Опис:</b> <i>{desc}</i><br>"
+  help_config_title: "<b>⚙️ | Конфігурація:</b><br>"
+  help_config_item: "    ⬥ <code>{key}</code>: <i>{desc}</i> (Поточне: <code>{val}</code>)<br>"
+  help_commands_title: "<b>🛠 | Команди:</b><br>"
+  help_command_item: " • <code>{prefix}{cmd}</code> — <i>{desc}</i><br>"
+  core_frozen: "Модулі ядра заморожені в пам'яті та не можуть бути змінені!"
+  dep_conflict: "<b>⚠️ Виявлено конфлікт залежностей!</b><br>Модуль <code>{id}</code> потребує пакети, які вже використовуються іншими модулями:<br>{conflicts}<br><br><b>Все одно встановити?</b>"
+  dep_confirm_yes: "✅ Встановити"
+  dep_confirm_no: "❌ Скасувати"
+  dep_install_failed: "Помилка встановлення залежностей: {err}"
+  dep_conflict_cancelled: "Встановлення скасовано: конфлікт залежностей"
+  syntax_error: "Помилка синтаксису в коді модуля: {msg} (рядок {line})"
+  no_meta: "Недійсний модуль: 'class Meta' не знайдено!"
+  install_error_dep: "Помилка встановлення залежностей для <code>{name}</code>: {err}"
+  module_failed: "Модуль <code>{name}</code> не запустився. Залежності встановлено, перевірте логи."
+  zip_no_root: "Zip повинен містити кореневу директорію (ім'я модуля)"
+  zip_no_init: "Недійсний zip-модуль: '__init__.py' не знайдено в кореневій директорії"
+  module_exists: "Модуль '{name}' вже існує!"
+  invalid_zip: "Недійсний zip-файл!"
+  not_in_repo: "Модуль '{target}' не знайдено в репозиторіях"
+  no_target: "Не вказано модуль або код для встановлення!"
+  module_not_found: "Модуль '{name}' не знайдено!"
+  not_file: "Це не файл!"
+
+module:
+  no_description: "Немає опису"
+  no_description_available: "Опис недоступний"
+
+security:
+  core_import: "Імпорт ядра заборонено: {name}"
+  memory_access: "Доступ до пам'яті заборонено"
+  subprocess: "Subprocess заборонено для сторонніх модулів"
+  write_access: "Доступ на запис заборонено"
+  forbidden_attr: "Заборонений атрибут '{attr}'"
+  forbidden_import: "Заборонений імпорт '{name}'"
+  eval_forbidden: "{name}() заборонено"
+  getattr_bypass: "спроба обходу getattr через '{name}'"
+  syntax_error: "Синтаксична помилка"
+  no_access: "ні"
+  temp_expired: "⏰ | {name}, ваш час вичерпано. Ви більше не можете використовувати .{cmd}"
+
+log:
+  format: "<pre><code>{text}</code></pre>"
+
+main:
+  welcome: "👋 | Це <b>MXUserbot</b>. Дякуємо за встановлення!<br>🔖 | <b>Префікс за замовчуванням</b> [.]<br>┗ .set_prefix 'any_symbol'<br>🤔 | <u><b>Початок роботи</b></u><br><ol><li>[Опціонально] Підтвердьте бота через SAS verification</li><li><code>help</code> — список всіх команд</li></ol>📦 | <u><b>Модулі</b></u><br><ol><li><code>ms &lt;name&gt;</code> — пошук модулів</li><li><code>mdl &lt;name&gt;</code> — встановити модуль</li><li><code>unmd &lt;name&gt;</code> — видалити модуль</li><li><code>addrepo &lt;url&gt;</code> — додати репозиторій</li><li><code>cfg &lt;module&gt; &lt;key&gt; &lt;value&gt;</code> — налаштувати модуль</li></ol>🌌 | <a href='https://matrix.to/#/#MxUserbot:matrix.org'>#MxUserbot:matrix.org</a>"
+  bot_started: "🚀 <b>Бот запущено.</b> Завантажено <code>{count}</code> модулів."
+  db_access_denied: "Сторонні модулі не можуть напряму звертатися до бази даних"
+  load_errors: "⚠️ <b>Модулі не завантажились:</b><br>{errors}"
+
+lang:
+  switched: "✅ <b>Мову переключено на</b> <code>{code}</code>"
+  not_found: "❌ <b>Мову</b> <code>{code}</code> <b>не знайдено.</b> Доступно: {list}"
+  current: "🌐 <b>Поточна мова:</b> {code}"
+  available: "<b>Доступно:</b> {list}"

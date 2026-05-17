@@ -1,0 +1,69 @@
+# ©️ Pasha Hatsune, 2025-2026
+# This file is a part of MXUserbot
+# 🌐 https://github.com/MxUserBot/MXUserbot
+# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
+
+callback:
+  config_required: "❌ <b>Konfiguration erforderlich:</b> {name}<br>Schlüssel <code>{key}</code> ({desc}) ist leer.<br>Verwende: <code>{prefix}cfg {name} {key} [value]</code>"
+  usage: "ℹ️ <b>Nutzung:</b> <code>{prefix}{cmd} {usage}</code>"
+  error: "❌ <b>Fehler:</b> <code>{error}</code>"
+
+loader:
+  help_name: "<b>📦 | {name}</b>"
+  help_name_version: " <i>v{version}</i>"
+  help_desc: "<b>ℹ️ | Beschreibung:</b> <i>{desc}</i><br>"
+  help_config_title: "<b>⚙️ | Konfiguration:</b><br>"
+  help_config_item: "    ⬥ <code>{key}</code>: <i>{desc}</i> (Aktuell: <code>{val}</code>)<br>"
+  help_commands_title: "<b>🛠 | Befehle:</b><br>"
+  help_command_item: " • <code>{prefix}{cmd}</code> — <i>{desc}</i><br>"
+  core_frozen: "Kernmodule sind im Speicher eingefroren und können nicht geändert werden!"
+  dep_conflict: "<b>⚠️ Abhängigkeitskonflikt erkannt!</b><br>Modul <code>{id}</code> benötigt Pakete, die bereits von anderen Modulen verwendet werden:<br>{conflicts}<br><br><b>Trotzdem installieren?</b>"
+  dep_confirm_yes: "✅ Installieren"
+  dep_confirm_no: "❌ Abbrechen"
+  dep_install_failed: "Abhängigkeitsinstallation fehlgeschlagen: {err}"
+  dep_conflict_cancelled: "Installation abgebrochen: Abhängigkeitskonflikt"
+  syntax_error: "Syntaxfehler im Modulcode: {msg} (Zeile {line})"
+  no_meta: "Ungültiges Modul: 'class Meta' nicht gefunden!"
+  install_error_dep: "Abhängigkeitsinstallation für <code>{name}</code> fehlgeschlagen: {err}"
+  module_failed: "Modul <code>{name}</code> konnte nicht starten. Abhängigkeiten installiert, überprüfe Bot-Logs."
+  zip_no_root: "Zip muss ein Wurzelverzeichnis enthalten (den Modulnamen)"
+  zip_no_init: "Ungültiges Zip-Modul: '__init__.py' nicht im Wurzelverzeichnis gefunden"
+  module_exists: "Modul '{name}' existiert bereits!"
+  invalid_zip: "Ungültige Zip-Datei!"
+  not_in_repo: "Modul '{target}' in keinem Repository gefunden"
+  no_target: "Kein Ziel oder Code für die Installation angegeben!"
+  module_not_found: "Modul '{name}' nicht gefunden!"
+  not_file: "Ist keine Datei!"
+
+module:
+  no_description: "Keine Beschreibung"
+  no_description_available: "Keine Beschreibung verfügbar"
+
+security:
+  core_import: "Kernimport verboten: {name}"
+  memory_access: "Speicherzugriff verweigert"
+  subprocess: "Subprocess ist für Community-Module verboten"
+  write_access: "Schreibzugriff verweigert"
+  forbidden_attr: "Verbotenes Attribut '{attr}'"
+  forbidden_import: "Verbotener Import '{name}'"
+  eval_forbidden: "{name}() ist verboten"
+  getattr_bypass: "getattr-Umgehungsversuch für '{name}'"
+  syntax_error: "Syntaxfehler"
+  no_access: "nein"
+  temp_expired: "⏰ | {name}, deine Zeit ist abgelaufen. Du kannst .{cmd} nicht mehr verwenden."
+
+log:
+  format: "<pre><code>{text}</code></pre>"
+
+main:
+  welcome: "👋 | Dies ist <b>MXUserbot</b>. Danke für die Installation!<br>🔖 | <b>Standardpräfix</b> [.]<br>┗ .set_prefix 'any_symbol'<br>🤔 | <u><b>Erste Schritte</b></u><br><ol><li>[Optional] Verifiziere deinen Bot per SAS-Verifikation</li><li><code>help</code> — alle Befehle anzeigen</li></ol>📦 | <u><b>Module</b></u><br><ol><li><code>ms &lt;name&gt;</code> — Module suchen</li><li><code>mdl &lt;name&gt;</code> — Modul installieren</li><li><code>unmd &lt;name&gt;</code> — Modul entfernen</li><li><code>addrepo &lt;url&gt;</code> — Community-Repo hinzufügen</li><li><code>cfg &lt;module&gt; &lt;key&gt; &lt;value&gt;</code> — Modul konfigurieren</li></ol>🌌 | <a href='https://matrix.to/#/#MxUserbot:matrix.org'>#MxUserbot:matrix.org</a>"
+  bot_started: "🚀 <b>Bot gestartet.</b> <code>{count}</code> Module geladen."
+  db_access_denied: "Community-Module können nicht direkt auf die Datenbank zugreifen"
+  load_errors: "⚠️ <b>Module konnten nicht geladen werden:</b><br>{errors}"
+
+lang:
+  switched: "✅ <b>Sprache gewechselt zu</b> <code>{code}</code>"
+  not_found: "❌ <b>Sprache</b> <code>{code}</code> <b>nicht gefunden.</b> Verfügbar: {list}"
+  current: "🌐 <b>Aktuelle Sprache:</b> {code}"
+  available: "<b>Verfügbar:</b> {list}"

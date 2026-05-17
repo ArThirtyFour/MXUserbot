@@ -1,0 +1,69 @@
+# ©️ Pasha Hatsune, 2025-2026
+# This file is a part of MXUserbot
+# 🌐 https://github.com/MxUserBot/MXUserbot
+# You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+# 🔑 https://www.gnu.org/licenses/agpl-3.0.html
+
+callback:
+  config_required: "❌ <b>設定が必要です:</b> {name}<br>キー <code>{key}</code> ({desc}) が空です。<br>使用: <code>{prefix}cfg {name} {key} [value]</code>"
+  usage: "ℹ️ <b>使い方:</b> <code>{prefix}{cmd} {usage}</code>"
+  error: "❌ <b>エラー:</b> <code>{error}</code>"
+
+loader:
+  help_name: "<b>📦 | {name}</b>"
+  help_name_version: " <i>v{version}</i>"
+  help_desc: "<b>ℹ️ | 説明:</b> <i>{desc}</i><br>"
+  help_config_title: "<b>⚙️ | 設定:</b><br>"
+  help_config_item: "    ⬥ <code>{key}</code>: <i>{desc}</i> (現在: <code>{val}</code>)<br>"
+  help_commands_title: "<b>🛠 | コマンド:</b><br>"
+  help_command_item: " • <code>{prefix}{cmd}</code> — <i>{desc}</i><br>"
+  core_frozen: "コアモジュールはメモリに固定されており、変更できません！"
+  dep_conflict: "<b>⚠️ 依存関係の競合を検出しました！</b><br>モジュール <code>{id}</code> は他のモジュールが既に使用しているパッケージを必要としています:<br>{conflicts}<br><br><b>それでもインストールしますか？</b>"
+  dep_confirm_yes: "✅ インストール"
+  dep_confirm_no: "❌ キャンセル"
+  dep_install_failed: "依存関係のインストールに失敗しました: {err}"
+  dep_conflict_cancelled: "インストールをキャンセルしました: 依存関係の競合"
+  syntax_error: "モジュールコードに構文エラー: {msg} ({line}行目)"
+  no_meta: "無効なモジュール: 'class Meta' が見つかりません！"
+  install_error_dep: "<code>{name}</code> の依存関係インストールに失敗: {err}"
+  module_failed: "モジュール <code>{name}</code> が起動しませんでした。依存関係はインストール済みです。ボットのログを確認してください。"
+  zip_no_root: "Zipにはルートディレクトリ（モジュール名）が必要です"
+  zip_no_init: "無効なZipモジュール: ルートディレクトリに '__init__.py' が見つかりません"
+  module_exists: "モジュール '{name}' は既に存在します！"
+  invalid_zip: "無効なZipファイルです！"
+  not_in_repo: "モジュール '{target}' がどのリポジトリにも見つかりません"
+  no_target: "インストールするターゲットまたはコードが指定されていません！"
+  module_not_found: "モジュール '{name}' が見つかりません！"
+  not_file: "ファイルではありません！"
+
+module:
+  no_description: "説明なし"
+  no_description_available: "説明はありません"
+
+security:
+  core_import: "コアインポート禁止: {name}"
+  memory_access: "メモリアクセスが拒否されました"
+  subprocess: "コミュニティモジュールはサブプロセスを使用できません"
+  write_access: "書き込みアクセスが拒否されました"
+  forbidden_attr: "禁止された属性 '{attr}'"
+  forbidden_import: "禁止されたインポート '{name}'"
+  eval_forbidden: "{name}() は禁止されています"
+  getattr_bypass: "'{name}' でのgetattrバイパス試行"
+  syntax_error: "構文エラー"
+  no_access: "いいえ"
+  temp_expired: "⏰ | {name}、時間切れです。. {cmd} はもう使用できません。"
+
+log:
+  format: "<pre><code>{text}</code></pre>"
+
+main:
+  welcome: "👋 | これは <b>MXUserbot</b> です。インストールありがとうございます！<br>🔖 | <b>デフォルトプレフィックス</b> [.]<br>┗ .set_prefix 'any_symbol'<br>🤔 | <u><b>はじめに</b></u><br><ol><li>[オプション] SAS認証でボットを確認する</li><li><code>help</code> — すべてのコマンドを表示</li></ol>📦 | <u><b>モジュール</b></u><br><ol><li><code>ms &lt;name&gt;</code> — モジュールを検索</li><li><code>mdl &lt;name&gt;</code> — モジュールをインストール</li><li><code>unmd &lt;name&gt;</code> — モジュールを削除</li><li><code>addrepo &lt;url&gt;</code> — コミュニティリポジトリを追加</li><li><code>cfg &lt;module&gt; &lt;key&gt; &lt;value&gt;</code> — モジュールを設定</li></ol>🌌 | <a href='https://matrix.to/#/#MxUserbot:matrix.org'>#MxUserbot:matrix.org</a>"
+  bot_started: "🚀 <b>ボットが起動しました。</b> <code>{count}</code> 個のモジュールを読み込みました。"
+  db_access_denied: "コミュニティモジュールはデータベースに直接アクセスできません"
+  load_errors: "⚠️ <b>モジュールの読み込みに失敗しました:</b><br>{errors}"
+
+lang:
+  switched: "✅ <b>言語を</b> <code>{code}</code> <b>に切り替えました</b>"
+  not_found: "❌ <b>言語</b> <code>{code}</code> <b>が見つかりません。</b> 利用可能: {list}"
+  current: "🌐 <b>現在の言語:</b> {code}"
+  available: "<b>利用可能:</b> {list}"
