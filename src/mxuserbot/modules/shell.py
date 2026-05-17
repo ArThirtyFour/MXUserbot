@@ -11,7 +11,7 @@
 class Meta:
     name = "Shell"
     description = "Execute shell commands"
-    version = "1.1.0"
+    version = "1.2.0"
     tags = ["system"]
 
 
@@ -23,6 +23,75 @@ from mxc import utils
 from mxc.types import EmojiButton
 from mxc.utils.keyboard import EmojiKeyBoard
 from .. import loader
+from ..core.langs import Locales
+
+
+class Strings(BaseModel):
+    name: str
+    executing: str
+    confirm: str
+    cancelled: str
+    result: str
+    error: str
+    timeout: str
+
+
+locales = Locales(
+    ru=Strings(
+        name="Shell",
+        executing="<b>⚙️ | Выполняю команду...</b>",
+        confirm="⚠️ | <b>Подтверждение безопасности</b><br>Вы собираетесь выполнить:<br><code>{}</code><br><br><b>Продолжить?</b>",
+        cancelled="❌ | <b>Выполнение отменено.</b>",
+        result="<b>📟 | Команда:</b> <code>{}</code><br><b>📤 | Вывод:</b><br><code>{}</code>",
+        error="<b>❌ | Ошибка выполнения:</b><br><pre>{}</pre>",
+        timeout="<b>⏱️ | Таймаут выполнения (60s)</b>",
+    ),
+    en=Strings(
+        name="Shell",
+        executing="<b>⚙️ | Executing command...</b>",
+        confirm="⚠️ | <b>Security Confirmation</b><br>You are about to execute:<br><code>{}</code><br><br><b>Do you want to proceed?</b>",
+        cancelled="❌ | <b>Command execution cancelled.</b>",
+        result="<b>📟 | Command:</b> <code>{}</code><br><b>📤 | Output:</b><br><code>{}</code>",
+        error="<b>❌ | Error executing command:</b><br><pre>{}</pre>",
+        timeout="<b>⏱️ | Command execution timeout (60s)</b>",
+    ),
+    ua=Strings(
+        name="Shell",
+        executing="<b>⚙️ | Виконую команду...</b>",
+        confirm="⚠️ | <b>Підтвердження безпеки</b><br>Ви збираєтеся виконати:<br><code>{}</code><br><br><b>Продовжити?</b>",
+        cancelled="❌ | <b>Виконання скасовано.</b>",
+        result="<b>📟 | Команда:</b> <code>{}</code><br><b>📤 | Вивід:</b><br><code>{}</code>",
+        error="<b>❌ | Помилка виконання:</b><br><pre>{}</pre>",
+        timeout="<b>⏱️ | Таймаут виконання (60s)</b>",
+    ),
+    fr=Strings(
+        name="Shell",
+        executing="<b>⚙️ | Exécution de la commande...</b>",
+        confirm="⚠️ | <b>Confirmation de sécurité</b><br>Vous allez exécuter:<br><code>{}</code><br><br><b>Voulez-vous continuer?</b>",
+        cancelled="❌ | <b>Exécution annulée.</b>",
+        result="<b>📟 | Commande:</b> <code>{}</code><br><b>📤 | Sortie:</b><br><code>{}</code>",
+        error="<b>❌ | Erreur d'exécution:</b><br><pre>{}</pre>",
+        timeout="<b>⏱️ | Délai d'exécution dépassé (60s)</b>",
+    ),
+    de=Strings(
+        name="Shell",
+        executing="<b>⚙️ | Führe Befehl aus...</b>",
+        confirm="⚠️ | <b>Sicherheitsbestätigung</b><br>Sie führen aus:<br><code>{}</code><br><br><b>Fortfahren?</b>",
+        cancelled="❌ | <b>Befehlsausführung abgebrochen.</b>",
+        result="<b>📟 | Befehl:</b> <code>{}</code><br><b>📤 | Ausgabe:</b><br><code>{}</code>",
+        error="<b>❌ | Fehler bei der Ausführung:</b><br><pre>{}</pre>",
+        timeout="<b>⏱️ | Ausführungszeitüberschreitung (60s)</b>",
+    ),
+    jp=Strings(
+        name="Shell",
+        executing="<b>⚙️ | コマンドを実行中...</b>",
+        confirm="⚠️ | <b>セキュリティ確認</b><br>実行しようとしています:<br><code>{}</code><br><br><b>続行しますか？</b>",
+        cancelled="❌ | <b>コマンドの実行がキャンセルされました。</b>",
+        result="<b>📟 | コマンド:</b> <code>{}</code><br><b>📤 | 出力:</b><br><code>{}</code>",
+        error="<b>❌ | 実行エラー:</b><br><pre>{}</pre>",
+        timeout="<b>⏱️ | 実行がタイムアウトしました (60s)</b>",
+    ),
+)
 
 
 class ShellPayload(BaseModel):
@@ -75,16 +144,7 @@ class ShellExecutor:
 
 @loader.tds
 class ShellModule(loader.Module):
-
-    strings = {
-        "name": "Shell",
-        "executing": "<b>⚙️ | Executing command...</b>",
-        "confirm": "⚠️ | <b>Security Confirmation</b><br>You are about to execute:<br><code>{}</code><br><br><b>Do you want to proceed?</b>",
-        "cancelled": "❌ | <b>Command execution cancelled.</b>",
-        "result": "<b>📟 | Command:</b> <code>{}</code><br><b>📤 | Output:</b><br><code>{}</code>",
-        "error": "<b>❌ | Error executing command:</b><br><pre>{}</pre>",
-        "timeout": "<b>⏱️ | Command execution timeout (60s)</b>",
-    }
+    strings = locales
 
     @loader.command(security=loader.OWNER)
     async def sh(self, mx, event, payload: ShellPayload):

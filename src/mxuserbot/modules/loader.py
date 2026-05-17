@@ -26,8 +26,155 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from mxc.exceptions import UsageError
 from mxc import utils
 from mxc.types import EmojiButton
+from ..core import utils as cutils
 from mxc.utils.keyboard import EmojiKeyBoard
 from .. import loader
+from ..core.langs import Locales
+
+
+class Strings(BaseModel):
+    downloading: str
+    fetching: str
+    repo_not_found: str
+    search_empty: str
+    done: str
+    error: str
+    reloading: str
+    reloaded: str
+    unloaded: str
+    search_header: str
+    search_item: str
+    confirm_unsafe: str
+    confirm_cancelled: str
+    dev_usage: str
+    no_args: str
+    repo_added: str
+    repo_removed: str
+    invalid_file: str
+
+
+locales = Locales(
+    ru=Strings(
+        downloading="⏳ | <b>Скачивание...</b>",
+        fetching="⏳ | <b>Обработка <code>{id}</code>...</b>",
+        repo_not_found="❌ | <b>Модуль <code>{id}</code> не найден в репозиториях.</b>",
+        search_empty="❌ | <b>Модули не найдены по запросу: <code>{query}</code>.</b>",
+        done="✅ | <b>Модуль <code>{name}</code> успешно загружен!</b>",
+        error="❌ | <b>Ошибка: <code>{err}</code></b>",
+        reloading="⏳ | <b>Перезагрузка всех модулей...</b>",
+        reloaded="♻️ | <b>Модули перезагружены. Всего: {count}</b>",
+        unloaded="✅ | <b>Модуль <code>{name}</code> выгружен.</b>",
+        search_header="<b>{icon} | <a href='{url}'>{type} Repository</a></b><br>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯<br>",
+        search_item="📦 | <b><a href='{raw_url}'>{name}</a></b> [v{version}]<br>┗ <code>.mdl {cmd_id}</code><br><br>",
+        confirm_unsafe="⚠️ | <b>ПРЕДУПРЕЖДЕНИЕ БЕЗОПАСНОСТИ</b><br>Вы устанавливаете модуль из <b>{source}</b> — <b>НЕПРОВЕРЕННЫЙ</b> источник.<br>Этот модуль <b>НЕ</b> был проверен и может содержать вредоносный код.<br><br><b>Вы подтверждаете установку этого модуля?</b>",
+        confirm_cancelled="❌ | <b>Установка отменена пользователем.</b>",
+        dev_usage="❌ | <b>Прямые ссылки/файлы требуют префикса <code>dev</code>.</b>",
+        no_args="❌ | <b>Укажите ID модуля, URL или ответьте на .py файл!</b>",
+        repo_added="✅ | <b>Репозиторий добавлен: <code>{url}</code></b>",
+        repo_removed="✅ | <b>Репозиторий удалён.</b>",
+        invalid_file="❌ | <b>ТОЛЬКО .PY И .ZIP ФАЙЛЫ ПРИНИМАЮТСЯ!</b>",
+    ),
+    en=Strings(
+        downloading="⏳ | <b>Downloading...</b>",
+        fetching="⏳ | <b>Processing <code>{id}</code>...</b>",
+        repo_not_found="❌ | <b>Module <code>{id}</code> not found in any repository.</b>",
+        search_empty="❌ | <b>No modules found for query: <code>{query}</code>.</b>",
+        done="✅ | <b>Module <code>{name}</code> loaded successfully!</b>",
+        error="❌ | <b>Error: <code>{err}</code></b>",
+        reloading="⏳ | <b>Reloading all modules...</b>",
+        reloaded="♻️ | <b>Modules reloaded. Total: {count}</b>",
+        unloaded="✅ | <b>Module <code>{name}</code> unloaded.</b>",
+        search_header="<b>{icon} | <a href='{url}'>{type} Repository</a></b><br>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯<br>",
+        search_item="📦 | <b><a href='{raw_url}'>{name}</a></b> [v{version}]<br>┗ <code>.mdl {cmd_id}</code><br><br>",
+        confirm_unsafe="⚠️ | <b>SECURITY WARNING</b><br>You are installing a module from <b>{source}</b> — an <b>UNVERIFIED</b> source.<br>This module has <b>NOT</b> been reviewed and may contain malicious code.<br><br><b>Do you confirm that you want to install this module?</b>",
+        confirm_cancelled="❌ | <b>Installation cancelled by user.</b>",
+        dev_usage="❌ | <b>Direct links/files require <code>dev</code> prefix.</b>",
+        no_args="❌ | <b>Provide Module ID, URL or reply to a .py file!</b>",
+        repo_added="✅ | <b>Repository added: <code>{url}</code></b>",
+        repo_removed="✅ | <b>Repository removed.</b>",
+        invalid_file="❌ | <b>ONLY .PY AND .ZIP FILES ACCEPTED!</b>",
+    ),
+    ua=Strings(
+        downloading="⏳ | <b>Завантаження...</b>",
+        fetching="⏳ | <b>Обробка <code>{id}</code>...</b>",
+        repo_not_found="❌ | <b>Модуль <code>{id}</code> не знайдено в репозиторіях.</b>",
+        search_empty="❌ | <b>Модулі не знайдено за запитом: <code>{query}</code>.</b>",
+        done="✅ | <b>Модуль <code>{name}</code> успішно завантажено!</b>",
+        error="❌ | <b>Помилка: <code>{err}</code></b>",
+        reloading="⏳ | <b>Перезавантаження всіх модулів...</b>",
+        reloaded="♻️ | <b>Модулі перезавантажено. Всього: {count}</b>",
+        unloaded="✅ | <b>Модуль <code>{name}</code> вивантажено.</b>",
+        search_header="<b>{icon} | <a href='{url}'>{type} Repository</a></b><br>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯<br>",
+        search_item="📦 | <b><a href='{raw_url}'>{name}</a></b> [v{version}]<br>┗ <code>.mdl {cmd_id}</code><br><br>",
+        confirm_unsafe="⚠️ | <b>ПОПЕРЕДЖЕННЯ БЕЗПЕКИ</b><br>Ви встановлюєте модуль із <b>{source}</b> — <b>НЕПЕРЕВІРЕНЕ</b> джерело.<br>Цей модуль <b>НЕ</b> було перевірено та може містити шкідливий код.<br><br><b>Ви підтверджуєте встановлення цього модуля?</b>",
+        confirm_cancelled="❌ | <b>Встановлення скасовано користувачем.</b>",
+        dev_usage="❌ | <b>Прямі посилання/файли вимагають префікса <code>dev</code>.</b>",
+        no_args="❌ | <b>Вкажіть ID модуля, URL або відповідайте на .py файл!</b>",
+        repo_added="✅ | <b>Репозиторій додано: <code>{url}</code></b>",
+        repo_removed="✅ | <b>Репозиторій видалено.</b>",
+        invalid_file="❌ | <b>ТІЛЬКИ .PY ТА .ZIP ФАЙЛИ ПРИЙМАЮТЬСЯ!</b>",
+    ),
+    fr=Strings(
+        downloading="⏳ | <b>Téléchargement...</b>",
+        fetching="⏳ | <b>Traitement de <code>{id}</code>...</b>",
+        repo_not_found="❌ | <b>Module <code>{id}</code> introuvable dans les dépôts.</b>",
+        search_empty="❌ | <b>Aucun module trouvé pour la requête: <code>{query}</code>.</b>",
+        done="✅ | <b>Module <code>{name}</code> chargé avec succès!</b>",
+        error="❌ | <b>Erreur: <code>{err}</code></b>",
+        reloading="⏳ | <b>Rechargement de tous les modules...</b>",
+        reloaded="♻️ | <b>Modules rechargés. Total: {count}</b>",
+        unloaded="✅ | <b>Module <code>{name}</code> déchargé.</b>",
+        search_header="<b>{icon} | <a href='{url}'>{type} Repository</a></b><br>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯<br>",
+        search_item="📦 | <b><a href='{raw_url}'>{name}</a></b> [v{version}]<br>┗ <code>.mdl {cmd_id}</code><br><br>",
+        confirm_unsafe="⚠️ | <b>AVERTISSEMENT DE SÉCURITÉ</b><br>Vous installez un module depuis <b>{source}</b> — une source <b>NON VÉRIFIÉE</b>.<br>Ce module <b>N'A PAS</b> été examiné et peut contenir du code malveillant.<br><br><b>Confirmez-vous l'installation de ce module?</b>",
+        confirm_cancelled="❌ | <b>Installation annulée par l'utilisateur.</b>",
+        dev_usage="❌ | <b>Les liens/fichiers directs nécessitent le préfixe <code>dev</code>.</b>",
+        no_args="❌ | <b>Fournissez un ID de module, une URL ou répondez à un fichier .py!</b>",
+        repo_added="✅ | <b>Dépôt ajouté: <code>{url}</code></b>",
+        repo_removed="✅ | <b>Dépôt supprimé.</b>",
+        invalid_file="❌ | <b>SEULS LES FICHIERS .PY ET .ZIP SONT ACCEPTÉS!</b>",
+    ),
+    de=Strings(
+        downloading="⏳ | <b>Herunterladen...</b>",
+        fetching="⏳ | <b>Verarbeite <code>{id}</code>...</b>",
+        repo_not_found="❌ | <b>Modul <code>{id}</code> in keinem Repository gefunden.</b>",
+        search_empty="❌ | <b>Keine Module gefunden für: <code>{query}</code>.</b>",
+        done="✅ | <b>Modul <code>{name}</code> erfolgreich geladen!</b>",
+        error="❌ | <b>Fehler: <code>{err}</code></b>",
+        reloading="⏳ | <b>Lade alle Module neu...</b>",
+        reloaded="♻️ | <b>Module neu geladen. Gesamt: {count}</b>",
+        unloaded="✅ | <b>Modul <code>{name}</code> entladen.</b>",
+        search_header="<b>{icon} | <a href='{url}'>{type} Repository</a></b><br>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯<br>",
+        search_item="📦 | <b><a href='{raw_url}'>{name}</a></b> [v{version}]<br>┗ <code>.mdl {cmd_id}</code><br><br>",
+        confirm_unsafe="⚠️ | <b>SICHERHEITSWARNUNG</b><br>Sie installieren ein Modul von <b>{source}</b> — einer <b>UNVERIFIZIERTEN</b> Quelle.<br>Dieses Modul wurde <b>NICHT</b> geprüft und könnte schädlichen Code enthalten.<br><br><b>Bestätigen Sie die Installation dieses Moduls?</b>",
+        confirm_cancelled="❌ | <b>Installation vom Benutzer abgebrochen.</b>",
+        dev_usage="❌ | <b>Direkte Links/Dateien erfordern das <code>dev</code>-Präfix.</b>",
+        no_args="❌ | <b>Geben Sie eine Modul-ID, URL oder antworten Sie auf eine .py-Datei!</b>",
+        repo_added="✅ | <b>Repository hinzugefügt: <code>{url}</code></b>",
+        repo_removed="✅ | <b>Repository entfernt.</b>",
+        invalid_file="❌ | <b>NUR .PY- UND .ZIP-DATEIEN WERDEN AKZEPTIERT!</b>",
+    ),
+    jp=Strings(
+        downloading="⏳ | <b>ダウンロード中...</b>",
+        fetching="⏳ | <b><code>{id}</code> を処理中...</b>",
+        repo_not_found="❌ | <b>モジュール <code>{id}</code> がどのリポジトリにも見つかりません。</b>",
+        search_empty="❌ | <b>クエリ <code>{query}</code> に一致するモジュールはありません。</b>",
+        done="✅ | <b>モジュール <code>{name}</code> を正常に読み込みました!</b>",
+        error="❌ | <b>エラー: <code>{err}</code></b>",
+        reloading="⏳ | <b>すべてのモジュールを再読み込み中...</b>",
+        reloaded="♻️ | <b>モジュールを再読み込みしました。合計: {count}</b>",
+        unloaded="✅ | <b>モジュール <code>{name}</code> をアンロードしました。</b>",
+        search_header="<b>{icon} | <a href='{url}'>{type} Repository</a></b><br>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯<br>",
+        search_item="📦 | <b><a href='{raw_url}'>{name}</a></b> [v{version}]<br>┗ <code>.mdl {cmd_id}</code><br><br>",
+        confirm_unsafe="⚠️ | <b>セキュリティ警告</b><br><b>{source}</b> からモジュールをインストールしようとしています — <b>未検証</b>のソースです。<br>このモジュールはレビューされておらず、悪意のあるコードを含む可能性があります。<br><br><b>このモジュールをインストールしてもよろしいですか？</b>",
+        confirm_cancelled="❌ | <b>ユーザーによりインストールがキャンセルされました。</b>",
+        dev_usage="❌ | <b>直接リンク/ファイルには <code>dev</code> プレフィックスが必要です。</b>",
+        no_args="❌ | <b>モジュールID、URLを指定するか、.pyファイルに返信してください!</b>",
+        repo_added="✅ | <b>リポジトリを追加しました: <code>{url}</code></b>",
+        repo_removed="✅ | <b>リポジトリを削除しました。</b>",
+        invalid_file="❌ | <b>.PY および .ZIP ファイルのみ受け付けます!</b>",
+    ),
+)
 
 
 class MdlPayload(BaseModel):
@@ -53,7 +200,7 @@ class RepoPayload(BaseModel):
     @classmethod
     def parse(cls, v: Any):
         if isinstance(v, str):
-            return {"url": utils.convert_repo_url(v.strip())}
+            return {"url": cutils.convert_repo_url(v.strip())}
         return {"url": ""}
 
 class SearchPayload(BaseModel):
@@ -84,27 +231,7 @@ class LoaderModule(loader.Module):
         "dev_warn_ok": loader.ConfigValue(False, "User accepted dev/file installation warning")
     }
 
-    strings = {
-        "downloading": "⏳ | <b>Downloading...</b>",
-        "fetching": "⏳ | <b>Processing <code>{id}</code>...</b>",
-        "repo_not_found": "❌ | <b>Module <code>{id}</code> not found in any repository.</b>",
-        "search_empty": "❌ | <b>No modules found for query: <code>{query}</code>.</b>",
-        "done": "✅ | <b>Module <code>{name}</code> loaded successfully!</b>",
-        "error": "❌ | <b>Error: <code>{err}</code></b>",
-        "reloading": "⏳ | <b>Reloading all modules...</b>",
-        "reloaded": "♻️ | <b>Modules reloaded. Total: {count}</b>",
-        "unloaded": "✅ | <b>Module <code>{name}</code> unloaded.</b>",
-        "search_header": "<b>{icon} | <a href='{url}'>{type} Repository</a></b><br>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯<br>",
-        "search_item": "📦 | <b><a href='{raw_url}'>{name}</a></b> [v{version}]<br>┗ <code>.mdl {cmd_id}</code><br><br>",
-
-        "confirm_unsafe": "⚠️ | <b>SECURITY WARNING</b><br>You are installing a module from <b>{source}</b> — an <b>UNVERIFIED</b> source.<br>This module has <b>NOT</b> been reviewed and may contain malicious code.<br><br><b>Do you confirm that you want to install this module?</b>",
-        "confirm_cancelled": "❌ | <b>Installation cancelled by user.</b>",
-        "dev_usage": "❌ | <b>Direct links/files require <code>dev</code> prefix.</b>",
-        "no_args": "❌ | <b>Provide Module ID, URL or reply to a .py file!</b>",
-        "repo_added": "✅ | <b>Repository added: <code>{url}</code></b>",
-        "repo_removed": "✅ | <b>Repository removed.</b>",
-        "invalid_file": "❌ | <b>ONLY .PY AND .ZIP FILES ACCEPTED!</b>"
-    }
+    strings = locales
 
     async def _matrix_start(self, mx):
         self.repo = loader.RepoManager(mx, self._db, self.config.get("repo_url"))
@@ -372,7 +499,7 @@ class LoaderModule(loader.Module):
         errors = await self.loader.register_all(mx)
         msg = self.strings["reloaded"].format(count=len(mx.active_modules))
         if errors:
-            error_lines = [f"  ⚠️ <b>{e['name']}</b>: <code>{utils.escape_html(e['error'])}</code>" for e in errors]
+            error_lines = [f"  ⚠️ <b>{e['name']}</b>: <code>{cutils.escape_html(e['error'])}</code>" for e in errors]
             msg += "<br><br><b>Failed modules:</b><br>" + "<br>".join(error_lines)
         await utils.answer(mx, msg, edit_id=status_id)
 
