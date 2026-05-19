@@ -13,11 +13,7 @@
 
 <p><b>SPACE:</b> <a href="https://matrix.to/#/#SpacePashaHatsune:matrix.org">Matrix Space</a></p>
 
-<h3>Contribution</h3>
-<p>
-  We accept <b>Issues</b> and <b>Pull requests</b>.<br>
-  If you have ideas or code — send them over, I will review everything.
-</p>
+<h3>The bot is in active development!</h3>
 
 <hr>
 <h3><img src="assets/promo/sparkles.gif" width="32" height="32"> Feature</h3>

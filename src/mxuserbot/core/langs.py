@@ -6,10 +6,10 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 import yaml
-from pathlib import Path
 from pydantic import BaseModel
 
 LANGS_DIR = Path(__file__).resolve().parent.parent / "langpacks"
