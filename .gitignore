@@ -32,7 +32,7 @@ mxu.rocksdb/
 
 # Docker
 docker-compose.override.yml
-
+src/mxuserbot/community
 # Logs
 *.log
 
